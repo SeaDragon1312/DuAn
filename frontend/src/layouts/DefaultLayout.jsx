@@ -1,17 +1,15 @@
 import React from 'react';
+import Header from '../components/navigation/Header';
+import Footer from '../components/navigation/Footer';
 
 const DefaultLayout = ({ children }) => {
     return (
-        <div>
-            <header>
-                <h1>My MERN App</h1>
-            </header>
-            <main>
+        <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-grow container mx-auto py-8">
                 {children}
             </main>
-            <footer>
-                <p>&copy; 2025 My MERN App</p>
-            </footer>
+            <Footer />
         </div>
     );
 };

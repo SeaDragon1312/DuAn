@@ -5,12 +5,16 @@ import Index from "./pages/index";
 import HomePage from "./pages/HomePage";
 import "./App.css";
 import DefaultLayout from "./layouts/DefaultLayout";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 import {
   SignedIn,
   SignedOut,
   SignInButton,
   UserButton,
 } from "@clerk/clerk-react";
+import ExampleProvider from "./providers/ExampleProvide";
+import LandingPage from "./pages/LandingPage";
 
 if (!process.env.REACT_APP_CLERK_PUBLISHABLE_KEY) {
   throw new Error("Missing Publishable Key");
@@ -20,24 +24,42 @@ const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 function App() {
   return (
     <ClerkProvider publishableKey={clerkPubKey}>
-      <BrowserRouter>
-        <SignedIn>
-          <UserButton />
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <DefaultLayout>
-                  <HomePage />
-                </DefaultLayout>
-              }
-            />
-          </Routes>
-        </SignedIn>
-        <SignedOut>
-          <SignInButton />
-        </SignedOut>
-      </BrowserRouter>
+      <ExampleProvider>
+        <BrowserRouter>
+          <SignedIn>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <DefaultLayout>
+                    <HomePage />
+                  </DefaultLayout>
+                }
+              />
+              <Route
+                path="/about"
+                element={
+                  <DefaultLayout>
+                    <AboutPage />
+                  </DefaultLayout>
+                }
+              />
+              <Route
+                path="/contact"
+                element={
+                  <DefaultLayout>
+                    <ContactPage />
+                  </DefaultLayout>
+                }
+              />
+            </Routes>
+          </SignedIn>
+          <SignedOut>
+            {/* <SignInButton /> */}
+            <LandingPage />
+          </SignedOut>
+        </BrowserRouter>
+      </ExampleProvider>
     </ClerkProvider>
   );
 }
