@@ -67,8 +67,8 @@ function LandingPage() {
               Your one-stop solution for amazing features.
             </p>
             <p className="text-gray-600 mb-8">
-              We provide cutting-edge tools that help you accomplish more with less effort.
-              Our platform is designed with user experience in mind, making complex tasks simple.
+            We provide the best recipes today, you can share your recipes
+             with the help of AI without having to struggle to find pictures to illustrate them
             </p>
             <div className="flex flex-wrap gap-4">
               <button className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors">
