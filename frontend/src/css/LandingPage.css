@@ -24,8 +24,40 @@
     font-size: 1.2rem;
     margin-bottom: 2rem;
   }
-  
   .sign-in-button {
+    background-color: #ffffff;
+    color: #2575fc;
+    border: 2px solid #2575fc;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .sign-in-button:hover {
+    background-color: #2575fc;
+    color: #ffffff;
+    border-color: #ffffff;
+  }
+
+  .sign-up-button {
+    background-color: #2575fc;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .sign-up-button:hover {
+    background-color: #ffffff;
+    color: #2575fc;
+    border-color: #2575fc;
+  }
+  /* .sign-in-button {
     background-color: #ffffff;
     color: #2575fc;
     border: none;
@@ -35,8 +67,15 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
-  
-  .sign-in-button:hover {
-    background-color: #f0f0f0;
-  }
+
+  .sign-up-button {
+    background-color: #ffffff;
+    color: #2575fc;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  } */
   

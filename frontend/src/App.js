@@ -15,6 +15,7 @@ import {
 } from "@clerk/clerk-react";
 import ExampleProvider from "./providers/ExampleProvide";
 import LandingPage from "./pages/LandingPage";
+import "../src/output.css";
 
 if (!process.env.REACT_APP_CLERK_PUBLISHABLE_KEY) {
   throw new Error("Missing Publishable Key");
