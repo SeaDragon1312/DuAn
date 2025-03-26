@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 
-public class Recipe {
-    private Integer id;
-    private String dishName;
-    private String imageUrl;
+public class User {
+    private String username;
+    private String password;
 }
