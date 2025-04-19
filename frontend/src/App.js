@@ -7,6 +7,7 @@ import "./App.css";
 import DefaultLayout from "./layouts/DefaultLayout";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
+import RecipeView from "./components/RecipeView/RecipeView";
 import {
   SignedIn,
   SignedOut,
@@ -50,6 +51,14 @@ function App() {
                 element={
                   <DefaultLayout>
                     <ContactPage />
+                  </DefaultLayout>
+                }
+              />
+              <Route
+                path="/recipe/view/:id"
+                element={
+                  <DefaultLayout>
+                    <RecipeView />
                   </DefaultLayout>
                 }
               />
