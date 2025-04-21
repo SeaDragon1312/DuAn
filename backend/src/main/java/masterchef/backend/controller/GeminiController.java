@@ -8,8 +8,6 @@ import masterchef.backend.service.ImagenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 // import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 
 @RestController
@@ -21,8 +19,8 @@ public class GeminiController {
     @Autowired
     GeminiTextService geminiTextService;
 
-    @GetMapping("/path")
-    public String getMethodName() {
+    @GetMapping("/image")
+    public String getImage() {
         return imagenService.getImage("bun bo Hue");
     }
 
@@ -32,7 +30,7 @@ public class GeminiController {
     }
 
     @GetMapping("/aitext")
-    public String getMethodName(@RequestParam String param) {
+    public String getText() {
         return geminiTextService.generateText("give me ingredient list of chocolate milk");
     }
     
