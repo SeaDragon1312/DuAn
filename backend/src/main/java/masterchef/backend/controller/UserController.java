@@ -3,6 +3,7 @@ package masterchef.backend.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import masterchef.backend.model.User;
+import masterchef.backend.model.UserForm;
 import masterchef.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class UserController {
     @Autowired
     UserRepository userRepository;
+
+    @PostMapping("signup")
+    public String signUp(@RequestBody User user) {
+        User existingUser = userRepository.findByUsername(user.getUsername());
+        if (existingUser != null) {
+            return "User already exists";
+        }
+        
+        userRepository.save(user);
+        return "User created successfully";
+    }
+
+    @PostMapping("login")
+    public String login(@RequestBody UserForm userForm) {
+        User user = userRepository.findByUsername(userForm.getUsername());
+        if (user == null) {
+            return "User not found";
+        }
+        
+        if (!user.getPassword().equals(userForm.getPassword())) {
+            return "Invalid password";
+        }
+        
+        return "Login successful";
+    }
+    
+    
 
     @PostMapping("get")
     public ResponseEntity<?> getUser(@RequestBody String username) {

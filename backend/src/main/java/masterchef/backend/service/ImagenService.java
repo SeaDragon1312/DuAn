@@ -5,6 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import masterchef.backend.ConstantList;
@@ -14,11 +15,14 @@ public class ImagenService {
     private String API_KEY = ConstantList.GEMINI_KEY;
     private final String ENDPOINT = ConstantList.IMAGEN_ENDPOINT + API_KEY;
 
+    @Autowired
+    WebsiteImageService websiteImageService;
+
     public String getImage(String prompt) {
         try {
             // Prepare JSON payload
             JSONObject json = new JSONObject();
-            json.put("generationConfig", new JSONObject().put("responseModalities", new String[]{"Text", "Image"}));
+            json.put("generationConfig", new JSONObject().put("responseModalities", new String[] { "Text", "Image" }));
             json.put("contents", new org.json.JSONArray().put(new JSONObject()
                     .put("parts", new org.json.JSONArray().put(new JSONObject().put("text",
                             prompt)))));
@@ -53,8 +57,8 @@ public class ImagenService {
             }
 
             connection.disconnect();
-            return "response code: " +responseCode;
-            
+            return "response code: " + responseCode;
+
         } catch (Exception e) {
             return e.getStackTrace().toString();
         }
@@ -73,7 +77,11 @@ public class ImagenService {
         try (FileOutputStream fos = new FileOutputStream(fileName)) {
             byte[] decodedBytes = Base64.getDecoder().decode(base64Image);
             fos.write(decodedBytes);
-        } catch (IOException e) {
+
+            // save image to database
+            websiteImageService.saveImage(decodedBytes);
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -21,7 +21,7 @@ public class RecipeController {
 
     @PostMapping("get")
     public ResponseEntity<?> getRecipe(@RequestBody Integer id) {
-        Recipe recipe = recipeRepository.findById(id);
+        Recipe recipe = recipeRepository.findById(id).get();
         
         return new ResponseEntity<>(recipe, HttpStatus.OK);
     }

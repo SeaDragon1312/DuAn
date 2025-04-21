@@ -21,7 +21,7 @@ public class StepController {
 
     @PostMapping("get")
     public ResponseEntity<?> getStep(@RequestBody Integer id) {
-        Step step = stepRepository.findById(id);
+        Step step = stepRepository.findById(id).get();
         
         return new ResponseEntity<>(step, HttpStatus.OK);
     }
