@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import masterchef.backend.dto.RecipeDTO;
 
 @Getter
 @NoArgsConstructor
@@ -32,4 +33,10 @@ public class Recipe {
     @ManyToOne
     @JoinColumn(name = "owner_username", referencedColumnName = "username")
     private User user;
+
+    public Recipe(RecipeDTO recipeDTO, User user) {
+        this.dishName = recipeDTO.getDishName();
+        this.image = recipeDTO.getImage();
+        this.user = user;
+    }
 }

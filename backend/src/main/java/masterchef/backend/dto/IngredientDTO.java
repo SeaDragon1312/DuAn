@@ -3,16 +3,14 @@ package masterchef.backend.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import masterchef.backend.model.WebsiteImage;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class RecipeDTO {
-    private String dishName;
-    private WebsiteImage image;
+public class IngredientDTO {
+    private String name;
     
-    private String username;
+    private Integer recipeId;
     
 }

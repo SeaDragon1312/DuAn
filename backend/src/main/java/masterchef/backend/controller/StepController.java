@@ -2,6 +2,9 @@ package masterchef.backend.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import masterchef.backend.dto.IngredientDTO;
+import masterchef.backend.dto.StepDTO;
+import masterchef.backend.model.Ingredient;
 import masterchef.backend.model.Recipe;
 import masterchef.backend.model.Step;
 import masterchef.backend.repository.RecipeRepository;
@@ -45,6 +48,24 @@ public class StepController {
         List<Step> stepList = stepRepository.findAllByRecipe(recipe.get());
         
         return new ResponseEntity<>(stepList, HttpStatus.OK);
+    }
+
+    @PostMapping("add") 
+    public ResponseEntity<?> addStep(@RequestBody StepDTO stepDTO) {
+        Optional<Recipe> recipe = recipeRepository.findById(stepDTO.getRecipeId());
+
+        Step step = new Step(stepDTO, recipe.get());
+
+        stepRepository.save(step);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("delete")
+    public ResponseEntity<?> deleteStep(@RequestBody Integer id) {
+        stepRepository.deleteById(id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
     
     

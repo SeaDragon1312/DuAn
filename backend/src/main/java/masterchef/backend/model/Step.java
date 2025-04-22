@@ -10,6 +10,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import masterchef.backend.dto.StepDTO;
 
 @Getter
 @NoArgsConstructor
@@ -27,4 +28,9 @@ public class Step {
     @ManyToOne
     @JoinColumn(name = "recipe_id", referencedColumnName = "id")
     private Recipe recipe;
+
+    public Step(StepDTO stepDTO, Recipe recipe) {
+        this.description = stepDTO.getDescription();
+        this.recipe = recipe;
+    }
 }

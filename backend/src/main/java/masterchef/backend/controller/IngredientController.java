@@ -2,6 +2,7 @@ package masterchef.backend.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import masterchef.backend.dto.IngredientDTO;
 import masterchef.backend.model.Ingredient;
 import masterchef.backend.model.Recipe;
 import masterchef.backend.repository.IngredientRepository;
@@ -42,6 +43,24 @@ public class IngredientController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         List<Ingredient> ingredientList = ingredientRepository.findAllByRecipe(recipe.get());
+
+        return new ResponseEntity<>(ingredientList, HttpStatus.OK);
+    }
+
+    @PostMapping("add")
+    public ResponseEntity<?> addIngredient(@RequestBody IngredientDTO ingredientDTO) {
+        Optional<Recipe> recipe = recipeRepository.findById(ingredientDTO.getRecipeId());
+
+        Ingredient ingredient = new Ingredient(ingredientDTO, recipe.get());
+
+        ingredientRepository.save(ingredient);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("delete")
+    public ResponseEntity<?> deleteIngredient(@RequestBody Integer id) {
+        ingredientRepository.deleteById(id);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

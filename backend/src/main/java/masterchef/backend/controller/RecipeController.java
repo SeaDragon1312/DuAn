@@ -2,6 +2,7 @@ package masterchef.backend.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import masterchef.backend.dto.RecipeDTO;
 import masterchef.backend.model.Recipe;
 import masterchef.backend.model.User;
 import masterchef.backend.repository.RecipeRepository;
@@ -53,7 +54,9 @@ public class RecipeController {
     }
 
     @PostMapping("add")
-    public ResponseEntity<?> addRecipe(@RequestBody Recipe recipe) {
+    public ResponseEntity<?> addRecipe(@RequestBody RecipeDTO recipeDTO) {
+        User user = userRepository.findByUsername(recipeDTO.getUsername());
+        Recipe recipe = new Recipe(recipeDTO, user);
         recipeRepository.save(recipe);
 
         return new ResponseEntity<>(HttpStatus.OK);
