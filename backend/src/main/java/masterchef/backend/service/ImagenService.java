@@ -22,7 +22,6 @@ public class ImagenService {
 
     public String getImage(String prompt) {
         try {
-            // Prepare JSON payload
             JSONObject json = new JSONObject();
             json.put("generationConfig", new JSONObject().put("responseModalities", new String[] { "Text", "Image" }));
             json.put("contents", new org.json.JSONArray().put(new JSONObject()
@@ -48,7 +47,6 @@ public class ImagenService {
 
                 // System.out.println(response);
 
-                // Extract base64 image data
                 String base64Data = extractBase64Image(response);
                 if (base64Data != null) {
                     saveBase64Image(base64Data, "gemini-native-image.png");

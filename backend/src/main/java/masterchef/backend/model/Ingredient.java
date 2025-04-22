@@ -33,4 +33,9 @@ public class Ingredient {
         this.name = ingredientDTO.getName();
         this.recipe = recipe;
     }
+
+    public Ingredient(String name, Recipe recipe) {
+        this.name = name;
+        this.recipe = recipe;
+    }
 }

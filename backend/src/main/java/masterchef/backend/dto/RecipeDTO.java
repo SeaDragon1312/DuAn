@@ -3,7 +3,6 @@ package masterchef.backend.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import masterchef.backend.model.WebsiteImage;
 
 @Getter
 @NoArgsConstructor
@@ -11,8 +10,8 @@ import masterchef.backend.model.WebsiteImage;
 
 public class RecipeDTO {
     private String dishName;
-    private WebsiteImage image;
-    
+    private String procedure;
+
     private String username;
     
 }

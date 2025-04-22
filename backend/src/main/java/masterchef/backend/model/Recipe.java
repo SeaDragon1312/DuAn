@@ -1,5 +1,6 @@
 package masterchef.backend.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,7 +12,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import masterchef.backend.dto.RecipeDTO;
+// import masterchef.backend.dto.RecipeDTO;
 
 @Getter
 @NoArgsConstructor
@@ -26,7 +27,13 @@ public class Recipe {
     private Integer id;
     private String dishName;
 
-    @OneToOne
+    @Column(columnDefinition = "TEXT")
+    private String introduction;
+
+    @Column(columnDefinition = "TEXT")
+    private String healthImpact;
+
+    @ManyToOne
     @JoinColumn(name = "image_id", referencedColumnName = "id")
     private WebsiteImage image;
 
@@ -34,9 +41,11 @@ public class Recipe {
     @JoinColumn(name = "owner_username", referencedColumnName = "username")
     private User user;
 
-    public Recipe(RecipeDTO recipeDTO, User user) {
-        this.dishName = recipeDTO.getDishName();
-        this.image = recipeDTO.getImage();
+    public Recipe(String dishName, String introduction, String healthImpact, WebsiteImage image, User user) {
+        this.dishName = dishName;
+        this.introduction = introduction;
+        this.healthImpact = healthImpact;
+        this.image = image;
         this.user = user;
     }
 }

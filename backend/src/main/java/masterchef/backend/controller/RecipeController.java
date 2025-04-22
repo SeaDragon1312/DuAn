@@ -53,13 +53,13 @@ public class RecipeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("add")
-    public ResponseEntity<?> addRecipe(@RequestBody RecipeDTO recipeDTO) {
-        User user = userRepository.findByUsername(recipeDTO.getUsername());
-        Recipe recipe = new Recipe(recipeDTO, user);
-        recipeRepository.save(recipe);
+    // @PostMapping("add")
+    // public ResponseEntity<?> addRecipe(@RequestBody RecipeDTO recipeDTO) {
+    //     User user = userRepository.findByUsername(recipeDTO.getUsername());
+    //     Recipe recipe = new Recipe(recipeDTO, user);
+    //     recipeRepository.save(recipe);
 
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>(HttpStatus.OK);
+    // }
 
 }

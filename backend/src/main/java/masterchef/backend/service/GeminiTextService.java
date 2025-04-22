@@ -43,6 +43,7 @@ public class GeminiTextService {
             }
 
             connection.disconnect();
+            return "Request failed with response code: " + responseCode;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -65,4 +66,5 @@ public class GeminiTextService {
         }
         return null;
     }
+    
 }

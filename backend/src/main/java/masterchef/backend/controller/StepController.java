@@ -2,9 +2,7 @@ package masterchef.backend.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import masterchef.backend.dto.IngredientDTO;
 import masterchef.backend.dto.StepDTO;
-import masterchef.backend.model.Ingredient;
 import masterchef.backend.model.Recipe;
 import masterchef.backend.model.Step;
 import masterchef.backend.repository.RecipeRepository;
