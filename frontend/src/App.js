@@ -7,7 +7,8 @@ import "./App.css";
 import DefaultLayout from "./layouts/DefaultLayout";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
-import RecipeView from "./components/RecipeView/RecipeView";
+import RecipeView from "./components/Recipe/RecipeView";
+import RecipeSubmit from "./components/Recipe/RecipeSubmit";
 import {
   SignedIn,
   SignedOut,
@@ -59,6 +60,14 @@ function App() {
                 element={
                   <DefaultLayout>
                     <RecipeView />
+                  </DefaultLayout>
+                }
+              />
+              <Route
+                path="/recipe/submit"
+                element={
+                  <DefaultLayout>
+                    <RecipeSubmit />
                   </DefaultLayout>
                 }
               />

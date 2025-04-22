@@ -96,6 +96,14 @@ const HomePage = () => {
   // Rest of the component remains the same
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Link 
+          to="/recipe/submit" 
+          className="inline-block px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors"
+        >
+          Submit a Recipe
+        </Link>
+      </div>
       <h1 className="text-3xl font-bold mb-6">There's more to explore</h1>
       
       <div className="relative mb-6">

@@ -1,27 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import "../../output.css";
-
-// Icons for use in the component
-const ClockIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
-  </svg>
-);
-
-const InfoIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-  </svg>
-);
-
-const WarningIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-  </svg>
-);
+import ClockIcon from '../../assets/ClockIcon.jsx';
+import WarningIcon from '../../assets/WarningIcon.jsx';
+import HealthIcon from '../../assets/HealthIcon.jsx';
 
 const RecipeView = () => {
   const { id } = useParams();
@@ -159,30 +141,41 @@ const RecipeView = () => {
       
       {/* Main content with white background */}
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-xl shadow-md p-8 mb-8">
+        <div className="bg-white rounded-xl shadow-md p-8 mb-8 hover:shadow-lg transition-shadow">
           <h2 className="text-2xl font-bold mb-4 text-gray-800 border-b pb-2">Introduction</h2>
-          <p className="text-gray-700 leading-relaxed text-lg">{recipe.description}</p>
+          <p className="text-gray-700 leading-relaxed text-lg font-semibold">{recipe.description}</p>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-center mb-4">
-              <span className="bg-blue-100 text-blue-600 p-2 rounded-full mr-3">
-                <InfoIcon />
-              </span>
-              <h2 className="text-xl font-bold text-gray-800">Health Impact</h2>
+
+        <div className="bg-white rounded-xl shadow-md p-8 mb-8 hover:shadow-lg transition-shadow">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800 border-b pb-2">Good To Know</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* Healthy Card */}
+            <div className="bg-white rounded-xl">
+              <div className="bg-green-100 rounded-xl">
+                <div className="flex items-center mb-4">
+                  <span className="p-2 rounded-full mr-3">
+                    <HealthIcon />
+                  </span>
+                  <h2 className="text-xl font-bold text-gray-800">Health Impact</h2>
+                </div>
+              </div>
+              <h2 className="text-xl font-bold text-gray-800">Some health implications (5/10)</h2>
+              <p className="text-gray-600 leading-relaxed">{recipe.healthImpact}</p>
             </div>
-            <p className="text-gray-600 leading-relaxed">{recipe.healthImpact}</p>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-center mb-4">
-              <span className="bg-yellow-100 text-yellow-600 p-2 rounded-full mr-3">
-                <WarningIcon />
-              </span>
-              <h2 className="text-xl font-bold text-gray-800">Warning</h2>
+            
+            {/* Allergy Card */}
+            <div className="bg-white rounded-xl">
+              <div className="bg-yellow-100 rounded-xl">
+                <div className="flex items-center mb-4">
+                  <span className="bg-yellow-100 text-yellow-600 p-2 rounded-full mr-3">
+                    <WarningIcon />
+                  </span>
+                  <h2 className="text-xl font-bold text-gray-800">Allergy Information</h2>
+                </div>
+              </div>
+              <h2 className="text-xl font-bold text-gray-800">No Common Allergens</h2>
+              <p className="text-gray-600 leading-relaxed">{recipe.allergyInfo}</p>
             </div>
-            <p className="text-gray-600 leading-relaxed">{recipe.allergyInfo}</p>
           </div>
         </div>
         
@@ -236,7 +229,7 @@ const RecipeView = () => {
             {recipe.steps.map((step, index) => (
               <div key={index} className="flex">
                 <div className="mr-6 flex-shrink-0">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white flex items-center justify-center shadow-md">
+                  <div className="h-12 w-12 rounded-full bg-gray-200 text-black-700 flex items-center justify-center font-semibold">
                     {index + 1}
                   </div>
                 </div>
