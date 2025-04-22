@@ -2,8 +2,8 @@ package masterchef.backend.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import masterchef.backend.dto.UserDTO;
 import masterchef.backend.model.User;
-import masterchef.backend.model.UserForm;
 import masterchef.backend.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @PostMapping("login")
-    public String login(@RequestBody UserForm userForm) {
+    public String login(@RequestBody UserDTO userForm) {
         User user = userRepository.findByUsername(userForm.getUsername());
         if (user == null) {
             return "User not found";

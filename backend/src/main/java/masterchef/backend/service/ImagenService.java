@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,8 @@ public class ImagenService {
                 InputStream is = connection.getInputStream();
                 String response = new String(is.readAllBytes());
 
+                // System.out.println(response);
+
                 // Extract base64 image data
                 String base64Data = extractBase64Image(response);
                 if (base64Data != null) {
@@ -64,11 +68,34 @@ public class ImagenService {
         }
     }
 
-    private String extractBase64Image(String response) {
-        int startIndex = response.indexOf("\"data\": \"") + 9;
-        int endIndex = response.indexOf("\"", startIndex);
-        if (startIndex != -1 && endIndex != -1) {
-            return response.substring(startIndex, endIndex);
+    private String extractBase64Image(String jsonResponse) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonResponse);
+            JSONArray candidates = jsonObject.getJSONArray("candidates");
+            if (candidates.length() > 0) {
+                JSONObject firstCandidate = candidates.getJSONObject(0);
+                JSONObject content = firstCandidate.getJSONObject("content");
+                JSONArray parts = content.getJSONArray("parts");
+
+                boolean foundImage = false;
+
+                for (int i = 0; i < parts.length(); i++) {
+                    JSONObject part = parts.getJSONObject(i);
+                    if (part.has("inlineData")) {
+                        JSONObject inlineData = part.getJSONObject("inlineData");
+                        if (inlineData.has("data")) {
+                            foundImage = true;
+                            return inlineData.getString("data");
+                        }
+                    }
+                }
+
+                if (!foundImage)
+                    return null;
+            } else
+                return null;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }

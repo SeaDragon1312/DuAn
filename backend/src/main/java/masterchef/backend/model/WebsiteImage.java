@@ -16,7 +16,7 @@ import lombok.Getter;
 
 public class WebsiteImage {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Blob imageData;
 
