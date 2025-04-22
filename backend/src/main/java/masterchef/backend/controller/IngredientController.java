@@ -3,7 +3,7 @@ package masterchef.backend.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import masterchef.backend.model.Ingredient;
-import masterchef.repository.IngredientRepository;
+import masterchef.backend.repository.IngredientRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

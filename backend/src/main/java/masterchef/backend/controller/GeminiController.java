@@ -23,12 +23,12 @@ public class GeminiController {
 
     @GetMapping("/image")
     public String getImage() {
-        return imagenService.getImage("bun bo Hue");
+        return imagenService.getImage("bun cha nuong");
     }
 
     @GetMapping("/hello")
     public String test() {
-        return new String("heolo");
+        return new String("hellolo");
     }
 
     @GetMapping("/aitext")

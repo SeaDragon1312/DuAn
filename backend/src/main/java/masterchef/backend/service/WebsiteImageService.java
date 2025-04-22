@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import masterchef.backend.model.WebsiteImage;
-import masterchef.repository.WebsiteImageRepository;
+import masterchef.backend.repository.WebsiteImageRepository;
 
 @Service
 public class WebsiteImageService {

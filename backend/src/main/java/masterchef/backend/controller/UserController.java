@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import masterchef.backend.model.User;
 import masterchef.backend.model.UserForm;
-import masterchef.repository.UserRepository;
+import masterchef.backend.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
