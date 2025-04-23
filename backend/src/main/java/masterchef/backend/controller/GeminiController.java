@@ -2,7 +2,7 @@ package masterchef.backend.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import masterchef.backend.dto.RecipeDTO;
+import masterchef.backend.dto.StarterRecipeDTO;
 import masterchef.backend.service.GeminiTextService;
 import masterchef.backend.service.GenerativeRecipeService;
 import masterchef.backend.service.ImagenService;
@@ -42,7 +42,7 @@ public class GeminiController {
     }
 
     @GetMapping("/generative-recipe")
-    public String generativeRecipe(@RequestBody RecipeDTO recipeDTO) {
+    public String generativeRecipe(@RequestBody StarterRecipeDTO recipeDTO) {
         return "Res: " + generativeRecipeService.generateRecipe(recipeDTO);
     }
 
