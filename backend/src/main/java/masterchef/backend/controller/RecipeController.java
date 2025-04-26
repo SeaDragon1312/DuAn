@@ -2,12 +2,15 @@ package masterchef.backend.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import masterchef.backend.dto.RecipeDTO;
+import masterchef.backend.dto.FullRecipeDTO;
 import masterchef.backend.model.Recipe;
 import masterchef.backend.model.User;
+import masterchef.backend.model.WebsiteImage;
 import masterchef.backend.repository.RecipeRepository;
 import masterchef.backend.repository.UserRepository;
+import masterchef.backend.repository.WebsiteImageRepository;
 
+import java.sql.Blob;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
 @RestController
 @RequestMapping("/api/recipe/")
 public class RecipeController {
@@ -29,17 +31,21 @@ public class RecipeController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    WebsiteImageRepository websiteImageRepository;
+
     @PostMapping("get")
     public ResponseEntity<?> getRecipe(@RequestBody Integer id) {
         Recipe recipe = recipeRepository.findById(id).get();
 
         return new ResponseEntity<>(recipe, HttpStatus.OK);
     }
-    
+
     @GetMapping("user/get")
     public ResponseEntity<?> getAllRecipeByUser(@RequestParam String username) {
         User user = userRepository.findByUsername(username);
-        if (user == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (user == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         List<Recipe> recipeList = recipeRepository.findAllByUser(user);
 
@@ -53,13 +59,21 @@ public class RecipeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // @PostMapping("add")
-    // public ResponseEntity<?> addRecipe(@RequestBody RecipeDTO recipeDTO) {
-    //     User user = userRepository.findByUsername(recipeDTO.getUsername());
-    //     Recipe recipe = new Recipe(recipeDTO, user);
-    //     recipeRepository.save(recipe);
+    @PostMapping("manual/add")
+    public ResponseEntity<?> addRecipe(@RequestBody FullRecipeDTO fullRecipeDTO, @RequestParam Blob image) {
+        User user = userRepository.findByUsername(fullRecipeDTO.getUsername());
+        if (user == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-    //     return new ResponseEntity<>(HttpStatus.OK);
-    // }
+        WebsiteImage websiteImage = new WebsiteImage(image);
+        websiteImageRepository.save(websiteImage);
+
+        Recipe recipe = new Recipe(fullRecipeDTO.getDishName(), fullRecipeDTO.getIntroduction(),
+                fullRecipeDTO.getHealthImpact(), fullRecipeDTO.getHealthScore(),
+                fullRecipeDTO.getAllergyWarning(), websiteImage, user);
+        recipeRepository.save(recipe);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }

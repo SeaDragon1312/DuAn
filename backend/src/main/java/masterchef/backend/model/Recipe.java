@@ -12,7 +12,6 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-// import masterchef.backend.dto.RecipeDTO;
 
 @Getter
 @NoArgsConstructor
@@ -33,7 +32,10 @@ public class Recipe {
     @Column(columnDefinition = "TEXT")
     private String healthImpact;
 
-    @ManyToOne
+    private Integer healthScore;
+    private String allergyWarning;
+
+    @OneToOne
     @JoinColumn(name = "image_id", referencedColumnName = "id")
     private WebsiteImage image;
 
@@ -41,10 +43,12 @@ public class Recipe {
     @JoinColumn(name = "owner_username", referencedColumnName = "username")
     private User user;
 
-    public Recipe(String dishName, String introduction, String healthImpact, WebsiteImage image, User user) {
+    public Recipe(String dishName, String introduction, String healthImpact, Integer healthScore, String warning, WebsiteImage image, User user) {
         this.dishName = dishName;
         this.introduction = introduction;
         this.healthImpact = healthImpact;
+        this.healthScore = healthScore;
+        this.allergyWarning = warning;
         this.image = image;
         this.user = user;
     }

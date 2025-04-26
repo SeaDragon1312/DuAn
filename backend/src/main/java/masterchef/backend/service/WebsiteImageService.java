@@ -15,9 +15,12 @@ public class WebsiteImageService {
     @Autowired
     private WebsiteImageRepository websiteImageRepository;
 
-    public void saveImage(byte[] imageData) throws Exception {
+    public Integer saveImage(byte[] imageData) throws Exception {
         Blob blob = new SerialBlob(imageData);
-        websiteImageRepository.save(new WebsiteImage(blob));
+
+        WebsiteImage websiteImage = new WebsiteImage(blob);
+        websiteImageRepository.save(websiteImage);
+        return websiteImage.getId();
     }
 
 }
