@@ -9,6 +9,7 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import RecipeView from "./components/Recipe/RecipeView";
 import RecipeSubmit from "./components/Recipe/RecipeSubmit";
+import MyRecipes from "./components/Recipe/MyRecipes";
 import {
   SignedIn,
   SignedOut,
@@ -68,6 +69,14 @@ function App() {
                 element={
                   <DefaultLayout>
                     <RecipeSubmit />
+                  </DefaultLayout>
+                }
+              />
+              <Route
+                path="/recipe/my-recipes"
+                element={
+                  <DefaultLayout>
+                    <MyRecipes />
                   </DefaultLayout>
                 }
               />

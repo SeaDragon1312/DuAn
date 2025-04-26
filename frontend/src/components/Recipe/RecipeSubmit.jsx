@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import "../../output.css";
-import ClockIcon from '../../assets/ClockIcon.jsx';
 import WarningIcon from '../../assets/WarningIcon.jsx';
 import HealthIcon from '../../assets/HealthIcon.jsx';
 
@@ -149,7 +148,7 @@ const RecipeSubmit = () => {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Recipes
+            Back
           </Link>
         </div>
       </div>
@@ -453,7 +452,7 @@ const RecipeSubmit = () => {
           <div className="flex justify-center">
             <button
               type="submit"
-              className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium text-lg rounded-lg shadow-md hover:shadow-lg transition-all"
+              className="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-500 text-white font-medium text-lg rounded-lg shadow-md hover:shadow-lg transition-all"
               disabled={loading}
             >
               {loading ? (

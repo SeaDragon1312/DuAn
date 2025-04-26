@@ -14,8 +14,8 @@ const RecipeCard = ({ id, imageUrl, title, author, dietType }) => {
       <div className="w-full h-full overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
         <div className="relative h-48 w-full overflow-hidden">
           <img 
-            src={imageUrl} 
-            alt={title} 
+            src={imageUrl}
+            alt={title}
             className="w-full h-full object-cover hover:scale-110 transition-transform"
           />
         </div>
@@ -96,14 +96,41 @@ const HomePage = () => {
   // Rest of the component remains the same
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <Link 
-          to="/recipe/submit" 
-          className="inline-block px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors"
-        >
-          Submit a Recipe
-        </Link>
+
+      <div className="flex flex-col md:flex-row mb-8 gap-4">
+        <div className="bg-gray-900 text-white rounded-lg p-6 md:w-5/6 flex flex-col justify-center">
+          <h2 className="text-2xl font-bold mb-2">Featured</h2>
+          <p className="italic">A delectable garlic bread recipe with a perfect balance of flavors.</p>
+        </div>
+        
+        <RecipeCard
+          id="1001"
+          imageUrl="/images/garlic-bread.jpg"
+          title="The Best Garlic Bread You'll Ever Eat"
+          author="Guest Chef"
+          dietType="Vegetarian"
+          className="md:w-1/2"
+        />
+
+        <div className="mt-auto p-4 bg-green-100 rounded-b-lg md:w-1/2">
+          <h3 className="text-2xl font-bold text-green-800 mb-8">Share with AI Assist</h3>
+          <button className="w-full mb-4 bg-green-800 text-white font-semibold py-3 shadow-md rounded-lg hover:bg-green-600 transition-colors">
+            <Link 
+              to="/recipe/submit"
+            >
+              Add Recipe
+            </Link>
+          </button>
+          <button className="w-full bg-green-800 text-white font-semibold py-3 rounded-lg hover:bg-green-600 transition-colors">
+            <Link 
+              to="/recipe/my-recipes"
+            >
+              My Recipes
+            </Link>
+          </button>
+        </div>
       </div>
+
       <h1 className="text-3xl font-bold mb-6">There's more to explore</h1>
       
       <div className="relative mb-6">
