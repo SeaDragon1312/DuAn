@@ -18,7 +18,7 @@ const RecipeView = () => {
           id,
           title: "The Best Garlic Bread You'll Ever Eat",
           author: 'Guest Chef',
-          imageUrl: '/images/garlic-bread.jpg',
+          imageUrl: '/images/garlic-bread.png',
           dietType: 'Vegetarian',
           prepTime: '25 mins',
           description: 'Indulge in the irresistible flavors of The Best Garlic Bread You\'ll Ever Eat by Guest Chef. This recipe combines the richness of butter and cheese with the aromatic garlic and parsley, resulting in a mouthwatering combination that will leave you craving for more.',

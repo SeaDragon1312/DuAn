@@ -37,56 +37,56 @@ const HomePage = () => {
   const recipes = [
     {
       id: '1001',
-      imageUrl: '/images/garlic-bread.jpg',
+      imageUrl: '/images/garlic-bread.png',
       title: 'The Best Garlic Bread You\'ll Ever Eat',
       author: 'Guest Chef',
       dietType: 'Vegetarian'
     },
     {
       id: '1002',
-      imageUrl: '/images/iced-coffee.jpg',
+      imageUrl: '/images/iced-coffee.png',
       title: 'Energising Iced Coffee',
       author: 'Dhruv Malik',
       dietType: 'Vegetarian'
     },
     {
       id: '1003',
-      imageUrl: '/images/spanish-omelet.jpg',
+      imageUrl: '/images/spanish-omelet.png',
       title: 'Spanish Omelet With Pickled Cherry Tomatoes',
       author: 'Michael Smith',
       dietType: 'Non-Vegetarian'
     },
     {
       id: '1004',
-      imageUrl: '/images/roasted-squash.jpg',
+      imageUrl: '/images/roasted-squash.png',
       title: 'Roasted Squash & Tomato Bowl With White Beans',
       author: 'Anna Olson',
       dietType: 'Vegan'
     },
     {
       id: '1005',
-      imageUrl: '/images/butter-chicken.jpg',
+      imageUrl: '/images/butter-chicken.png',
       title: 'Authentic Butter Chicken (Restaurant-Style)',
       author: 'Ranveer Brar',
       dietType: 'Non-Vegetarian'
     },
     {
       id: '1006',
-      imageUrl: '/images/egg-fried-rice.jpg',
+      imageUrl: '/images/egg-fried-rice.png',
       title: 'Uncle Roger\'s World-Famous Egg Fried Rice',
       author: 'Nigel Ng',
       dietType: 'Non-Vegetarian'
     },
     {
       id: '1007',
-      imageUrl: '/images/vegetables-paprika.jpg',
+      imageUrl: '/images/vegetables-paprika.png',
       title: 'Vegetables In Paprika Sauce With Spinach Rice',
       author: 'Sanjyot Keer',
       dietType: 'Vegetarian'
     },
     {
       id: '1008',
-      imageUrl: '/images/shrimp-scampi.jpg',
+      imageUrl: '/images/shrimp-scampi.png',
       title: 'Shrimp Scampi With Capellini Pasta',
       author: 'Gordon Ramsay',
       dietType: 'Non-Vegetarian'
@@ -105,8 +105,8 @@ const HomePage = () => {
         
         <RecipeCard
           id="1001"
-          imageUrl="/images/garlic-bread.jpg"
-          title="The Best Garlic Bread You'll Ever Eat"
+          imageUrl="/images/garlic-bread.png"
+          title="The Best Garlic Bread You'll Ever Eat" 
           author="Guest Chef"
           dietType="Vegetarian"
           className="md:w-1/2"
