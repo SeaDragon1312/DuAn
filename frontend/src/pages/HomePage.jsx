@@ -114,20 +114,20 @@ const HomePage = () => {
 
         <div className="mt-auto p-4 bg-green-100 rounded-b-lg md:w-1/2">
           <h3 className="text-2xl font-bold text-green-800 mb-8">Share with AI Assist</h3>
-          <button className="w-full mb-4 bg-green-800 text-white font-semibold py-3 shadow-md rounded-lg hover:bg-green-600 transition-colors">
-            <Link 
-              to="/recipe/submit"
-            >
-              Add Recipe
-            </Link>
-          </button>
-          <button className="w-full bg-green-800 text-white font-semibold py-3 rounded-lg hover:bg-green-600 transition-colors">
-            <Link 
-              to="/recipe/my-recipes"
-            >
-              My Recipes
-            </Link>
-          </button>
+          
+          <Link 
+            to="/recipe/submit"
+            className="w-full mb-4 block bg-green-800 text-white font-semibold py-3 shadow-md rounded-lg hover:bg-green-600 transition-colors text-center"
+          >
+            Add Recipe
+          </Link>
+
+          <Link 
+            to="/recipe/my-recipes"
+            className="w-full block bg-green-800 text-white font-semibold py-3 rounded-lg hover:bg-green-600 transition-colors text-center"
+          >
+            My Recipes
+          </Link>
         </div>
       </div>
 
