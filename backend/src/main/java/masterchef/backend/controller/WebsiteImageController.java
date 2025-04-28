@@ -38,7 +38,7 @@ public class WebsiteImageController {
             byte[] imageBytes = blob.getBytes(1, (int) blob.length());
 
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_JPEG);
+            headers.setContentType(MediaType.IMAGE_PNG);
             return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
 
         } catch (SQLException e) {
