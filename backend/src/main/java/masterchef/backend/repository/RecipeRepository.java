@@ -11,4 +11,5 @@ import masterchef.backend.model.User;
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     List<Recipe> findAllByUser(User user);
+    List<Recipe> findAllByDishNameContainingIgnoreCase(String dishName);
 }

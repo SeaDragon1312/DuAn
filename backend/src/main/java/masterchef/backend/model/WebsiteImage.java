@@ -2,6 +2,8 @@ package masterchef.backend.model;
 
 import java.sql.Blob;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,9 +24,12 @@ public class WebsiteImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @JsonIgnore
     private Blob imageData;
 
     public WebsiteImage(Blob imageData) {
         this.imageData = imageData;
     }
+
 }

@@ -45,8 +45,6 @@ public class UserController {
         return "Login successful";
     }
     
-    
-
     @PostMapping("get")
     public ResponseEntity<?> getUser(@RequestBody String username) {
         User user = userRepository.findByUsername(username);
