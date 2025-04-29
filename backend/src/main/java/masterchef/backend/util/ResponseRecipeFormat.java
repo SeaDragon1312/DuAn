@@ -11,4 +11,5 @@ public class ResponseRecipeFormat {
     private String healthImpact;
     private int healthScore;
     private String allergyWarning;
+    private String dietType;
 }

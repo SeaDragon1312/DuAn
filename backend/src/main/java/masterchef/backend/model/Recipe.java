@@ -34,6 +34,7 @@ public class Recipe {
 
     private Integer healthScore;
     private String allergyWarning;
+    private String dietType;
 
     @OneToOne
     @JoinColumn(name = "image_id", referencedColumnName = "id")
@@ -43,12 +44,14 @@ public class Recipe {
     @JoinColumn(name = "owner_username", referencedColumnName = "username")
     private User user;
 
-    public Recipe(String dishName, String introduction, String healthImpact, Integer healthScore, String warning, WebsiteImage image, User user) {
+    public Recipe(String dishName, String introduction, String healthImpact, Integer healthScore, String warning,
+            String dietType, WebsiteImage image, User user) {
         this.dishName = dishName;
         this.introduction = introduction;
         this.healthImpact = healthImpact;
         this.healthScore = healthScore;
         this.allergyWarning = warning;
+        this.dietType = dietType;
         this.image = image;
         this.user = user;
     }

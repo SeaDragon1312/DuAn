@@ -17,6 +17,6 @@ public class DisplayRecipeDTO {
         this.imageUrl = "http://localhost:8080/api/image/get?id=" + recipe.getImage().getId();
         this.title = recipe.getDishName();
         this.author = recipe.getUser().getFullName();
-        this.dietType = "dietType";
+        this.dietType = recipe.getDietType();
     }
 }

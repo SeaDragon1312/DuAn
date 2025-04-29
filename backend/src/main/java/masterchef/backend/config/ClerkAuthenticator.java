@@ -1,4 +1,4 @@
-package masterchef.backend;
+package masterchef.backend.config;
 
 import com.clerk.backend_api.Clerk;
 import com.clerk.backend_api.models.errors.ClerkErrors;

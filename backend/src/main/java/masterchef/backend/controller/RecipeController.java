@@ -100,7 +100,7 @@ public class RecipeController {
 
         Recipe recipe = new Recipe(fullRecipeDTO.getDishName(), fullRecipeDTO.getIntroduction(),
                 fullRecipeDTO.getHealthImpact(), fullRecipeDTO.getHealthScore(),
-                fullRecipeDTO.getAllergyWarning(), websiteImage, user);
+                fullRecipeDTO.getAllergyWarning(),fullRecipeDTO.getDietType(), websiteImage, user);
         recipeRepository.save(recipe);
 
         return new ResponseEntity<>(HttpStatus.OK);

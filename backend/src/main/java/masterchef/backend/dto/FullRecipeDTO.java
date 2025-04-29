@@ -12,6 +12,7 @@ public class FullRecipeDTO {
     private String healthImpact;
     private Integer healthScore;
     private String allergyWarning;
+    private String dietType;
     private String[] stepList;
     private String[] ingredientList;
     private String username;
