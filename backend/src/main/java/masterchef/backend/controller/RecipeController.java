@@ -36,8 +36,15 @@ public class RecipeController {
     @Autowired
     WebsiteImageRepository websiteImageRepository;
 
-    @GetMapping("get")
+    @PostMapping("get")
     public ResponseEntity<?> getRecipe(@RequestBody Integer id) {
+        Recipe recipe = recipeRepository.findById(id).get();
+
+        return new ResponseEntity<>(recipe, HttpStatus.OK);
+    }
+
+    @GetMapping("get-by-param-id")
+    public ResponseEntity<?> getRecipeByParamId(@RequestParam Integer id) {
         Recipe recipe = recipeRepository.findById(id).get();
 
         return new ResponseEntity<>(recipe, HttpStatus.OK);
@@ -61,15 +68,14 @@ public class RecipeController {
 
         return new ResponseEntity<>(displayRecipeDTOs, HttpStatus.OK);
     }
-    
 
     // @GetMapping("search")
     // public ResponseEntity<?> searchRecipe(@RequestParam String text) {
-    //     List<Recipe> recipeList = recipeRepository.findAllByDishNameContainingIgnoreCase(text);
+    // List<Recipe> recipeList =
+    // recipeRepository.findAllByDishNameContainingIgnoreCase(text);
 
-    //     return new ResponseEntity<>(recipeList, HttpStatus.OK);
+    // return new ResponseEntity<>(recipeList, HttpStatus.OK);
     // }
-    
 
     @GetMapping("user/get")
     public ResponseEntity<?> getAllRecipeByUser(@RequestParam String username) {
@@ -100,10 +106,9 @@ public class RecipeController {
 
         Recipe recipe = new Recipe(fullRecipeDTO.getDishName(), fullRecipeDTO.getIntroduction(),
                 fullRecipeDTO.getHealthImpact(), fullRecipeDTO.getHealthScore(),
-                fullRecipeDTO.getAllergyWarning(),fullRecipeDTO.getDietType(), websiteImage, user);
+                fullRecipeDTO.getAllergyWarning(), fullRecipeDTO.getDietType(), websiteImage, user);
         recipeRepository.save(recipe);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 }
