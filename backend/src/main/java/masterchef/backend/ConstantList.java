@@ -5,4 +5,5 @@ public interface ConstantList {
     static final String GEMINI_KEY = "AIzaSyBQ3qm1lKfXV5cU1iSkRtZMCth-hX3pQFk";
 
     static final String successfulHeader = "Image saved with ID=";
+    static final String dietTypes = "Vegan, Vegetarian or Non-Vegetarian";
 }

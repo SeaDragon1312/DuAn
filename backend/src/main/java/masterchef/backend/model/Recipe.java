@@ -1,5 +1,7 @@
 package masterchef.backend.model;
 
+import java.util.Date;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -44,6 +46,8 @@ public class Recipe {
     @JoinColumn(name = "owner_username", referencedColumnName = "username")
     private User user;
 
+    private Date publishedDate;
+
     public Recipe(String dishName, String introduction, String healthImpact, Integer healthScore, String warning,
             String dietType, WebsiteImage image, User user) {
         this.dishName = dishName;
@@ -54,5 +58,6 @@ public class Recipe {
         this.dietType = dietType;
         this.image = image;
         this.user = user;
+        this.publishedDate = new Date();
     }
 }

@@ -57,8 +57,8 @@ public class GenerativeRecipeService {
                 "\". Your task is to generate introduction for this dish, create a list of step for this dish," +
                 " a list of ingredients needed to cook it, its health impact, "
                 + "the allergy warning for this dish, "
-                + "determine the diet type of this dish in only one of these three types: Vegan, Vegetarian or Non-Vegetarian "
-                + "and give this recipe an integer health score between 0 and 10, " +
+                + "determine the diet type of this dish in only one of these three types: "+ConstantList.dietTypes
+                + " and give this recipe an integer health score between 0 and 10, " +
                 "with 10 implying that the recipe is extremely healthy and 0 implying that it is extremely unhealthy." +
                 "The output must be only a JSON object in this exact format: " +
                 ClassParser.parseClassToJson(ResponseRecipeFormat.class);
