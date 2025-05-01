@@ -2,17 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import "../../output.css";
 import ClockIcon from '../../assets/ClockIcon.jsx';
+import { useUser } from "@clerk/clerk-react";
 
 const MyRecipes = () => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const { user, isLoaded } = useUser();
 
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        // In a real app, fetch data from API. For now using mock data
+        setLoading(true);
+        //Fetch user's recipes from the backend API
+        const myRecipeResponse = await fetch(`/api/recipe/user/get?username=${user.username}`);
+        console.log('myRecipeResponse:', myRecipeResponse);
         const mockData = [
           {
             id: '1',
@@ -70,6 +75,8 @@ const MyRecipes = () => {
             status: 'draft'
           }
         ];
+
+        console.log('User:', user);
         
         setRecipes(mockData);
         setLoading(false);

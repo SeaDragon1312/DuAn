@@ -71,9 +71,11 @@ function LandingPage() {
              with the help of AI without having to struggle to find pictures to illustrate them
             </p>
             <div className="flex flex-wrap gap-4">
-              <button className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors">
-                Get Started
-              </button>
+              <SignInButton>
+                <button className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors">
+                  Get Started
+                </button>
+              </SignInButton>
               <button className="border border-blue-600 text-blue-600 px-6 py-3 rounded-md hover:bg-blue-50 transition-colors">
                 Learn More
               </button>

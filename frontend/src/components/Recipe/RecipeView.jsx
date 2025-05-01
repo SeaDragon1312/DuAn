@@ -183,38 +183,47 @@ const RecipeView = () => {
       </div>
 
       {/* Header section with dark background */}
-      <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 py-12 shadow-lg">
-        <div className="container mx-auto flex flex-col md:flex-row items-center">
-          <div className="md:w-1/2 pr-0 md:pr-12 mb-8 md:mb-0">
-            <h1 className="text-4xl font-bold mb-3 leading-tight">{recipe.dishName}</h1>
-            <p className="mb-4 text-gray-300 text-lg">By {recipe.user?.fullName || 'Unknown Chef'}</p>
-            
-            <div className="flex items-center space-x-6 mt-6">
-              <div className="flex items-center bg-gray-800 bg-opacity-50 px-4 py-2 rounded-lg">
-                <ClockIcon />
-                <span className="ml-2 font-medium">30 mins</span>
-              </div>
-              {recipe.dietType && (
-                <div className="bg-green-500 text-white px-4 py-2 rounded-lg font-medium">
-                  {recipe.dietType}
-                </div>
-              )}
-            </div>
-          </div>
+        <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 py-12 shadow-lg">
+          <div className="container mx-auto flex flex-col md:flex-row items-center">
+            <div className="md:w-1/2 pr-0 md:pr-12 mb-8 md:mb-0">
+          <h1 className="text-4xl font-bold mb-3 leading-tight">{recipe.dishName}</h1>
+          <p className="mb-4 text-gray-300 text-lg">By {recipe.user?.fullName || 'Unknown Chef'}</p>
           
-          <div className="md:w-1/2">
-            <div className="rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
-              <img 
-                src={`http://localhost:8080/api/image/get?id=${recipe.image?.id}` || '/default-recipe.jpg'} 
-                alt={recipe.dishName} 
-                className="w-full h-80 object-cover"
-              />
+          <div className="flex items-center space-x-6 mt-6">
+            <div className="flex items-center bg-gray-800 bg-opacity-50 px-4 py-2 rounded-lg shadow-md hover:bg-gray-900 transition-colors">
+              <ClockIcon />
+              <span className="ml-2 font-medium">30 mins</span>
+            </div>
+            {recipe.dietType && (
+              <div className="bg-green-500 text-white px-4 py-2 rounded-lg font-medium shadow-md hover:bg-green-600 transition-colors">
+            {recipe.dietType}
+              </div>
+            )}
+            {recipe.publishedDate && (
+              <div className="bg-gray-800 bg-opacity-90 px-4 py-2 rounded-lg font-medium shadow-md hover:bg-gray-900 transition-colors">
+            {new Date(recipe.publishedDate).toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            }).replace(/\//g, '/')}
+              </div>
+            )}
+          </div>
+            </div>
+            
+            <div className="md:w-1/2">
+              <div className="rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
+          <img 
+            src={`http://localhost:8080/api/image/get?id=${recipe.image?.id}` || '/default-recipe.jpg'} 
+            alt={recipe.dishName} 
+            className="w-full h-80 object-contain bg-gray-700"
+          />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      
-      {/* Main content with white background */}
+        
+        {/* Main content with white background */}
       <div className="container mx-auto px-4 py-8">
         <div className="bg-white rounded-xl shadow-md p-8 mb-8 hover:shadow-lg transition-shadow">
           <h2 className="text-2xl font-bold mb-4 text-gray-800 border-b pb-2">Introduction</h2>
@@ -237,7 +246,7 @@ const RecipeView = () => {
                 </div>
                 <div className="p-4">
                   <h2 className="text-xl font-bold text-gray-800">
-                    Health Score: {recipe.healthScore || 'Not Rated'}
+                    Health Score: {recipe.healthScore? `${recipe.healthScore}/10` : 'Not Rated'}
                   </h2>
                   <p className="text-gray-600 leading-relaxed mt-2">{recipe.healthImpact}</p>
                 </div>
