@@ -100,7 +100,7 @@ const HomePage = () => {
         </div>
 
         <RecipeCard
-          id="1001"
+          id="5"
           imageUrl="/images/garlic-bread.png"
           title="The Best Garlic Bread You'll Ever Eat"
           author="Guest Chef"
