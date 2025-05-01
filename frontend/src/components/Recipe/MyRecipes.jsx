@@ -13,72 +13,36 @@ const MyRecipes = () => {
 
   useEffect(() => {
     const fetchRecipes = async () => {
+      if (!isLoaded || !user) {
+        return;
+      }
+      
       try {
         setLoading(true);
-        //Fetch user's recipes from the backend API
-        const myRecipeResponse = await fetch(`/api/recipe/user/get?username=${user.username}`);
-        console.log('myRecipeResponse:', myRecipeResponse);
-        const mockData = [
-          {
-            id: '1',
-            title: 'The Best Garlic Bread You\'ll Ever Eat',
-            author: 'You',
-            imageUrl: '/images/garlic-bread.png',
-            dietType: 'Vegetarian',
-            prepTime: '25 mins',
-            dateCreated: '2025-04-15',
-            description: 'Indulge in the irresistible flavors of The Best Garlic Bread You\'ll Ever Eat. This recipe combines the richness of butter and cheese with the aromatic garlic and parsley.',
-            status: 'published'
-          },
-          {
-            id: '2',
-            title: 'Vietnamese Pho Soup',
-            author: 'You',
-            imageUrl: '/images/pho.png',
-            dietType: 'Non-Vegetarian',
-            prepTime: '2 hours',
-            dateCreated: '2025-04-10',
-            description: 'A classic Vietnamese noodle soup with beef, fresh herbs, and aromatic broth that warms your soul.',
-            status: 'published'
-          },
-          {
-            id: '3',
-            title: 'Summer Berry Smoothie Bowl',
-            author: 'You',
-            imageUrl: '/images/smoothie-bowl.png',
-            dietType: 'Vegan',
-            prepTime: '10 mins',
-            dateCreated: '2025-04-20',
-            description: 'A refreshing smoothie bowl packed with mixed berries, topped with granola, coconut flakes, and fresh fruits.',
-            status: 'draft'
-          },
-          {
-            id: '4',
-            title: 'Homemade Pizza Dough',
-            author: 'You',
-            imageUrl: '/images/pizza-dough.png',
-            dietType: 'Vegetarian',
-            prepTime: '1 hour 30 mins',
-            dateCreated: '2025-04-05',
-            description: 'The perfect base for your homemade pizzas. This dough is easy to make and gives you a crispy yet chewy crust.',
-            status: 'published'
-          },
-          {
-            id: '5',
-            title: 'Mediterranean Chickpea Salad',
-            author: 'You',
-            imageUrl: '/images/chickpea-salad.png',
-            dietType: 'Vegan',
-            prepTime: '15 mins',
-            dateCreated: '2025-04-22',
-            description: 'A protein-rich salad with chickpeas, cucumbers, tomatoes, and olives, dressed with lemon and olive oil.',
-            status: 'draft'
-          }
-        ];
-
-        console.log('User:', user);
+        // Fetch user's recipes from the backend API using the full URL
+        const myRecipeResponse = await fetch(`http://localhost:8080/api/recipe/user/get?username=${user.username}`);
         
-        setRecipes(mockData);
+        if (!myRecipeResponse.ok) {
+          throw new Error(`My Recipes API error: ${myRecipeResponse.status}`);
+        }
+
+        const data = await myRecipeResponse.json();
+        console.log('API my recipes:', data);
+        
+        // Transform backend data to match frontend structure
+        const transformedData = data.map(recipe => ({
+          id: recipe.id.toString(),
+          title: recipe.dishName,
+          author: recipe.user.fullName || recipe.user.username,
+          imageUrl: recipe.image ? `http://localhost:8080/api/image/get?id=${recipe.image.id}` : '/images/default-recipe.png',
+          dietType: recipe.dietType,
+          prepTime: "30 mins", // Add default or get from API if available
+          dateCreated: recipe.publishedDate,
+          description: recipe.introduction,
+          status: recipe.publishedDate ? 'published' : 'draft'
+        }));
+        
+        setRecipes(transformedData);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching recipes:', error);
@@ -87,7 +51,7 @@ const MyRecipes = () => {
     };
 
     fetchRecipes();
-  }, []);
+  }, [user, isLoaded]);
 
   // Filter recipes based on status and search term
   const filteredRecipes = recipes.filter(recipe => {
@@ -100,26 +64,40 @@ const MyRecipes = () => {
   });
 
   // Function to delete a recipe
-  const handleDeleteRecipe = (id) => {
+  const handleDeleteRecipe = async (id) => {
     if (window.confirm('Are you sure you want to delete this recipe?')) {
-      // In a real app, make an API call to delete
-      setRecipes(recipes.filter(recipe => recipe.id !== id));
+      try {
+        const response = await fetch(`http://localhost:8080/api/recipe/delete/${id}`, {
+          method: 'DELETE',
+        });
+        
+        if (response.ok) {
+          // Remove the recipe from state after successful deletion
+          setRecipes(recipes.filter(recipe => recipe.id !== id));
+        } else {
+          throw new Error('Failed to delete recipe');
+        }
+      } catch (error) {
+        console.error('Error deleting recipe:', error);
+        alert('Failed to delete recipe. Please try again.');
+      }
     }
   };
 
   return (
     <div className="bg-gray-50 min-h-screen">
-    {/* Back button at top */}
-            <div className="bg-white shadow-sm sticky top-0 z-10">
-            <div className="container mx-auto px-4 py-3">
-                <Link to="/" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back
-                </Link>
-            </div>
-            </div>
+      {/* Back button at top */}
+      <div className="bg-white shadow-sm sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-3">
+          <Link to="/" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back
+          </Link>
+        </div>
+      </div>
+      
       {/* Header section with dark background */}
       <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 py-12 shadow-lg">
         <div className="container mx-auto">
@@ -196,9 +174,11 @@ const MyRecipes = () => {
                     alt={recipe.title}
                     className="w-full h-48 object-cover"
                   />
-                  <div className="absolute top-3 right-3 bg-green-600 from-gray-900 to-gray-800 text-white text-xs font-bold px-2 py-1 rounded">
-                    {new Date(recipe.dateCreated).toLocaleDateString()}
-                  </div>
+                  {recipe.dateCreated && (
+                    <div className="absolute top-3 right-3 bg-green-600 from-gray-900 to-gray-800 text-white text-xs font-bold px-2 py-1 rounded">
+                      {new Date(recipe.dateCreated).toLocaleDateString()}
+                    </div>
+                  )}
                 </div>
                 
                 <div className="p-5">
@@ -214,7 +194,7 @@ const MyRecipes = () => {
                           <span className="ml-1">{recipe.prepTime}</span>
                         </div>
                         {recipe.status === 'draft' && (
-                            <div className=" top-3 left-3 bg-yellow-400 text-white text-xs font-bold px-2 py-1 rounded">DRAFT</div>
+                          <div className="top-3 left-3 bg-yellow-400 text-white text-xs font-bold px-2 py-1 rounded">DRAFT</div>
                         )}
                       </div>
                     </div>
@@ -224,7 +204,7 @@ const MyRecipes = () => {
                   
                   <div className="flex justify-between items-center pt-3 border-t border-gray-100">
                     <Link 
-                      to={`/recipe/${recipe.id}`} 
+                      to={`/recipe/view/${recipe.id}`} 
                       className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center"
                     >
                       View Recipe
