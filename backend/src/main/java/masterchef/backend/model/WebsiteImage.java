@@ -28,8 +28,19 @@ public class WebsiteImage {
     @JsonIgnore
     private Blob imageData;
 
+    private Integer recipeId;
+
     public WebsiteImage(Blob imageData) {
         this.imageData = imageData;
+    }
+
+    public WebsiteImage(Blob imageData, Integer recipeId) {
+        this.imageData = imageData;
+        this.recipeId = recipeId;
+    }
+
+    public void setRecipeId(Integer recipeId) {
+        this.recipeId = recipeId;
     }
 
 }

@@ -15,5 +15,6 @@ public class FullRecipeDTO {
     private String dietType;
     private String[] stepList;
     private String[] ingredientList;
-    private String username;
+
+    private String userId;
 }

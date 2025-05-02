@@ -28,6 +28,8 @@ public class Step {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    private Integer orderNum;
+
     @ManyToOne
     @JoinColumn(name = "recipe_id", referencedColumnName = "id")
     private Recipe recipe;
@@ -37,8 +39,9 @@ public class Step {
         this.recipe = recipe;
     }
 
-    public Step(String description, Recipe recipe) {
+    public Step(String description, Integer order, Recipe recipe) {
         this.description = description;
+        this.orderNum = order;
         this.recipe = recipe;
     }
 }

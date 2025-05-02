@@ -3,6 +3,8 @@ package masterchef.backend.service;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
 import org.json.*;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +13,8 @@ import masterchef.backend.ConstantList;
 @Service
 public class GeminiTextService {
     private final String API_KEY = ConstantList.GEMINI_KEY;
-    private final String ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
+    private final String ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="
+            + API_KEY;
 
     public String generateText(String prompt) {
         try {
@@ -35,8 +38,16 @@ public class GeminiTextService {
             // Read response
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                InputStream is = connection.getInputStream();
-                String response = new String(is.readAllBytes());
+                // Read the response from the input stream with UTF-8 encoding
+                InputStream inputStream = connection.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+                StringBuilder responseBuilder = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    responseBuilder.append(line);
+                }
+                String response = responseBuilder.toString();
+
                 return extractTextFromResponse(response);
             } else {
                 System.out.println("Request failed with response code: " + responseCode);
@@ -66,5 +77,5 @@ public class GeminiTextService {
         }
         return null;
     }
-    
+
 }

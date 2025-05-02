@@ -9,7 +9,8 @@ import masterchef.backend.dto.StarterRecipeDTO;
 import masterchef.backend.model.Ingredient;
 import masterchef.backend.model.Recipe;
 import masterchef.backend.model.Step;
-import masterchef.backend.model.User;
+import masterchef.backend.model.WebUser;
+import masterchef.backend.model.WebsiteImage;
 import masterchef.backend.repository.IngredientRepository;
 import masterchef.backend.repository.RecipeRepository;
 import masterchef.backend.repository.StepRepository;
@@ -42,7 +43,7 @@ public class GenerativeRecipeService {
     private WebsiteImageRepository websiteImageRepository;
 
     public String generateRecipe(StarterRecipeDTO recipeDTO) {
-        User user = userRepository.findByUsername(recipeDTO.getUsername());
+        WebUser user = userRepository.findByUserId(recipeDTO.getUserId());
         if (user == null)
             return null;
 
@@ -57,12 +58,14 @@ public class GenerativeRecipeService {
                 "\". Your task is to generate introduction for this dish, create a list of step for this dish," +
                 " a list of ingredients needed to cook it, its health impact, "
                 + "the allergy warning for this dish, "
-                + "determine the diet type of this dish in only one of these three types: "+ConstantList.dietTypes
+                + "determine the diet type of this dish in only one of these three types: " + ConstantList.dietTypes
                 + " and give this recipe an integer health score between 0 and 10, " +
                 "with 10 implying that the recipe is extremely healthy and 0 implying that it is extremely unhealthy." +
                 "The output must be only a JSON object in this exact format: " +
                 ClassParser.parseClassToJson(ResponseRecipeFormat.class);
         String godResponse = geminiTextService.generateText(godPrompt);
+
+        WebsiteImage websiteImage = websiteImageRepository.findById(imageId).get();
 
         try {
             JSONObject jsonObject = new JSONObject(sanitizeResponse(godResponse));
@@ -75,12 +78,13 @@ public class GenerativeRecipeService {
             String dietType = jsonObject.getString("dietType");
 
             Recipe recipe = new Recipe(recipeDTO.getDishName(), introduction, healthImpact, healthScore, allergyWarning,
-                    dietType, websiteImageRepository.findById(imageId).get(), user);
+                    dietType, websiteImage, user);
 
             recipeRepository.save(recipe);
+            websiteImage.setRecipeId(recipe.getId());
 
-            for (String step : steps) {
-                stepRepository.save(new Step(step, recipe));
+            for (int i = 0; i < steps.length; i++) {
+                stepRepository.save(new Step(steps[i], i, recipe));
             }
             for (String ingredient : ingredients) {
                 ingredientRepository.save(new Ingredient(ingredient, recipe));

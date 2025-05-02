@@ -43,13 +43,13 @@ public class Recipe {
     private WebsiteImage image;
 
     @ManyToOne
-    @JoinColumn(name = "owner_username", referencedColumnName = "username")
-    private User user;
+    @JoinColumn(name = "owner_id", referencedColumnName = "userId")
+    private WebUser user;
 
     private Date publishedDate;
 
     public Recipe(String dishName, String introduction, String healthImpact, Integer healthScore, String warning,
-            String dietType, WebsiteImage image, User user) {
+            String dietType, WebsiteImage image, WebUser user) {
         this.dishName = dishName;
         this.introduction = introduction;
         this.healthImpact = healthImpact;

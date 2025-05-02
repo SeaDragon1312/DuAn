@@ -15,7 +15,7 @@ import java.util.Properties;
 public class ClerkAuthenticator {
     private static String loadClerkKey() throws IOException {
         Properties props = new Properties();
-        InputStream inputStream = ClerkUser.class.getClassLoader().getResourceAsStream("application.properties");
+        InputStream inputStream = PostConstructClerkUser.class.getClassLoader().getResourceAsStream("application.properties");
         props.load(inputStream);
         String clerkKey = props.getProperty("CLERK_SECRET_KEY");
 
@@ -35,11 +35,13 @@ public class ClerkAuthenticator {
                 .request(req)
                 .call();
 
+        System.out.println();
+        System.out.println();
         if (res.userList().isPresent()) {
             List<User> users = res.userList().get();
             for (User user : users) {
-                System.out.println(user.emailAddresses().get().get(0).emailAddress() + " " + user.firstName() + " "
-                        + user.lastName());
+                System.out
+                        .println("Id: " + user.id().get() + " " + user.username().get() + " ");
             }
 
         }

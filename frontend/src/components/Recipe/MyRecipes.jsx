@@ -20,7 +20,8 @@ const MyRecipes = () => {
       try {
         setLoading(true);
         // Fetch user's recipes from the backend API using the full URL
-        const myRecipeResponse = await fetch(`http://localhost:8080/api/recipe/user/get?username=${user.username}`);
+        console.log(user);
+        const myRecipeResponse = await fetch(`http://localhost:8080/api/recipe/user/get?userId=${user.id}`);
         
         if (!myRecipeResponse.ok) {
           throw new Error(`My Recipes API error: ${myRecipeResponse.status}`);
@@ -68,7 +69,7 @@ const MyRecipes = () => {
     if (window.confirm('Are you sure you want to delete this recipe?')) {
       try {
         const response = await fetch(`http://localhost:8080/api/recipe/delete/${id}`, {
-          method: 'DELETE',
+          method: 'POST',
         });
         
         if (response.ok) {

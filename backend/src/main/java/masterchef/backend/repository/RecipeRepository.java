@@ -6,10 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import masterchef.backend.model.Recipe;
-import masterchef.backend.model.User;
+import masterchef.backend.model.WebUser;
 
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
-    List<Recipe> findAllByUser(User user);
+    List<Recipe> findAllByUser(WebUser user);
     List<Recipe> findAllByDishNameContainingIgnoreCase(String dishName);
 }

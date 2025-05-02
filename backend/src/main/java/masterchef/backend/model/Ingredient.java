@@ -33,10 +33,12 @@ public class Ingredient {
     public Ingredient(IngredientDTO ingredientDTO, Recipe recipe) {
         this.name = ingredientDTO.getName();
         this.recipe = recipe;
+        this.type = "food";
     }
 
     public Ingredient(String name, Recipe recipe) {
         this.name = name;
         this.recipe = recipe;
+        this.type = "food";
     }
 }

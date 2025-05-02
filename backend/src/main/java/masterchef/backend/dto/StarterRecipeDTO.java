@@ -9,6 +9,6 @@ public class StarterRecipeDTO {
     private String dishName;
     private String procedure;
 
-    private String username;
+    private String userId;
     
 }
