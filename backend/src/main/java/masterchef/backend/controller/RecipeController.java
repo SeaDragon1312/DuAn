@@ -93,7 +93,7 @@ public class RecipeController {
     public ResponseEntity<?> getAllRecipeByUser(@RequestParam String userId) {
         WebUser user = userRepository.findByUserId(userId);
         // if (user == null)
-        //     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        // return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         List<Recipe> recipeList = recipeRepository.findAllByUser(user);
         return new ResponseEntity<>(recipeList, HttpStatus.OK);
@@ -104,10 +104,10 @@ public class RecipeController {
         Recipe recipe = recipeRepository.findById(id).get();
         if (recipe == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        
+
         List<Step> stepList = stepRepository.findAllByRecipe(recipe);
         List<Ingredient> ingredientList = ingredientRepository.findAllByRecipe(recipe);
-        
+
         for (Step step : stepList) {
             stepRepository.delete(step);
         }
@@ -125,7 +125,7 @@ public class RecipeController {
     public ResponseEntity<?> addRecipe(@RequestBody FullRecipeDTO fullRecipeDTO, @RequestParam Blob image) {
         WebUser user = userRepository.findByUserId(fullRecipeDTO.getUserId());
         // if (user == null)
-        //     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        // return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         WebsiteImage websiteImage = new WebsiteImage(image);
 
@@ -144,7 +144,7 @@ public class RecipeController {
         }
 
         String[] ingredientList = fullRecipeDTO.getIngredientList();
-        for (String ingredientString: ingredientList) {
+        for (String ingredientString : ingredientList) {
             Ingredient ingredient = new Ingredient(ingredientString, recipe);
             ingredientRepository.save(ingredient);
         }

@@ -134,9 +134,14 @@ const RecipeView = () => {
           <p className="text-xl font-bold mt-4">Error loading recipe</p>
           <p className="text-gray-500 mt-2">{error}</p>
           <div className="mt-6">
-            <Link to="/" className="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-md transition-colors">
-              &larr; Back to Recipes
-            </Link>
+            <button 
+              onClick={() => window.history.back()} 
+              className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+                Back
+            </button>
           </div>
         </div>
       </div>
@@ -173,12 +178,14 @@ const RecipeView = () => {
       {/* Back button at top */}
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-3">
-          <Link to="/" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
+          <button 
+            onClick={() => window.history.back()} 
+            className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Recipes
-          </Link>
+              Back
+          </button>
         </div>
       </div>
 
@@ -192,7 +199,7 @@ const RecipeView = () => {
           <div className="flex items-center space-x-6 mt-6">
             <div className="flex items-center bg-gray-800 bg-opacity-50 px-4 py-2 rounded-lg shadow-md hover:bg-gray-900 transition-colors">
               <ClockIcon />
-              <span className="ml-2 font-medium">30 mins</span>
+              <span className="ml-2 font-medium">{recipe.preparationTime}</span>
             </div>
             {recipe.dietType && (
               <div className="bg-green-500 text-white px-4 py-2 rounded-lg font-medium shadow-md hover:bg-green-600 transition-colors">

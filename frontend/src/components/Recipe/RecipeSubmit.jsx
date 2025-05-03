@@ -1,22 +1,25 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import "../../output.css";
 import WarningIcon from '../../assets/WarningIcon.jsx';
 import HealthIcon from '../../assets/HealthIcon.jsx';
+import { useUser } from "@clerk/clerk-react";
 
 const RecipeSubmit = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const { user, isLoaded } = useUser();
   
   // Form state
   const [formData, setFormData] = useState({
     title: '',
-    author: '',
     dietType: 'Vegetarian',
     prepTime: '',
     description: '',
     healthImpact: '',
+    healthScore: 8,
     allergyInfo: '',
     ingredients: {
       veggiesAndFruits: [''],
@@ -79,6 +82,11 @@ const RecipeSubmit = () => {
     setFormData({ ...formData, steps: updatedSteps });
   };
 
+  const handleHealthScoreChange = (e) => {
+    const score = parseInt(e.target.value, 10);
+    setFormData({ ...formData, healthScore: score });
+  };
+
   // Add new step field
   const addStepField = () => {
     setFormData({ ...formData, steps: [...formData.steps, ''] });
@@ -95,20 +103,167 @@ const RecipeSubmit = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Validate form before submission
+    setLoading(true);
+
+    if (!isLoaded || !user) {
+      alert("You need to be logged in to submit recipes");
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      const userId = user.id
+      
+      const allIngredients = [
+        ...formData.ingredients.veggiesAndFruits,
+        ...formData.ingredients.dairy,
+        ...formData.ingredients.spicesAndCondiments
+      ].filter(item => item.trim() !== '');
+
+      // Format the data for the API
+      const recipeData = {
+        dishName: formData.title,
+        introduction: formData.description,
+        healthImpact: formData.healthImpact,
+        healthScore: formData.healthScore,
+        allergyWarning: formData.allergyInfo,
+        dietType: formData.dietType,
+        stepList: formData.steps.filter(step => step.trim() !== ''),
+        ingredientList: allIngredients,
+        userId: userId
+      };
+  
+      // Create FormData object for multipart/form-data
+      const formDataToSend = new FormData();
+      
+      // Append the recipe data as a JSON string
+      formDataToSend.append('recipe', new Blob([JSON.stringify(recipeData)], { type: 'application/json' }));
+      
+      // Get the image file from the imagePreview
+      if (imagePreview) {
+        // Convert dataURL to file
+        const fetchRes = await fetch(imagePreview);
+        const blob = await fetchRes.blob();
+        formDataToSend.append('image', blob, 'recipe-image.jpg');
+      }
+  
+      // Send the request
+      const response = await axios.post(
+        'http://localhost:8080/api/recipe/manual/add', 
+        formDataToSend,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data', 
+          },
+        }
+      );
+  
+      console.log('Recipe submitted successfully:', response.data);
+      
+      // Redirect to the recipe view page
+      // const recipeId = response.data.id || 'new-recipe'; // Replace with actual ID from response
+      // navigate(`/recipe/${recipeId}`);
+      
+    } catch (error) {
+      const userId = user.id
+      const allIngredients = [
+        ...formData.ingredients.veggiesAndFruits,
+        ...formData.ingredients.dairy,
+        ...formData.ingredients.spicesAndCondiments
+      ].filter(item => item.trim() !== '');
+      const recipeData = {
+        dishName: formData.title,
+        introduction: formData.description,
+        healthImpact: formData.healthImpact,
+        healthScore: formData.healthScore,
+        allergyWarning: formData.allergyInfo,
+        dietType: formData.dietType,
+        stepList: formData.steps.filter(step => step.trim() !== ''),
+        ingredientList: allIngredients,
+        userId: userId
+      };
+      const formDataToSend = new FormData();
+      
+      // Append the recipe data as a JSON string
+      formDataToSend.append('recipe', new Blob([JSON.stringify(recipeData)], { type: 'application/json' }));
+      
+      // Get the image file from the imagePreview
+      if (imagePreview) {
+        // Convert dataURL to file
+        const fetchRes = await fetch(imagePreview);
+        const blob = await fetchRes.blob();
+        formDataToSend.append('image', blob, 'recipe-image.jpg');
+      }
+      console.error('Error submitting recipe:', error.response?.data || error.message);
+      console.log('data:', recipeData);
+      console.log('imagePreview:', imagePreview);
+      console.log('formDataToSend:', formDataToSend);
+      alert('Failed to submit recipe. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Update the handleSaveDraft function with similar approach
+  const handleSaveDraft = async (e) => {
+    e.preventDefault();
     setLoading(true);
     
     try {
-      // In a real app, send data to API
-      console.log('Submitting recipe data:', formData);
+      const userId = user.id;
+
+      const allIngredients = [
+        ...formData.ingredients.veggiesAndFruits,
+        ...formData.ingredients.dairy,
+        ...formData.ingredients.spicesAndCondiments
+      ].filter(item => item.trim() !== '');
       
-      // Mock API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Format the data for the API
+      const recipeData = {
+        dishName: formData.title || "Draft Recipe",
+        introduction: formData.description || "",
+        healthImpact: formData.healthImpact || "",
+        healthScore: formData.healthScore || 10,
+        allergyWarning: formData.allergyInfo || "",
+        dietType: formData.dietType,
+        stepList: formData.steps.filter(step => step.trim() !== ''),
+        ingredientList: allIngredients,
+        userId: userId
+      };
+  
+      // Create FormData object for multipart/form-data
+      const formDataToSend = new FormData();
       
-      // Redirect to the recipe view page (with a dummy ID for this example)
-      navigate('/recipe/new-recipe-123');
+      // Append the recipe data as a JSON string
+      formDataToSend.append('recipe', new Blob([JSON.stringify(recipeData)], { type: 'application/json' }));
+      
+      // Get the image file from the imagePreview
+      if (imagePreview) {
+        // Convert dataURL to file
+        const fetchRes = await fetch(imagePreview);
+        const blob = await fetchRes.blob();
+        formDataToSend.append('image', blob, 'recipe-image.jpg');
+      }
+  
+      // Send the request to save as draft
+      // You might need a different endpoint for drafts
+      const response = await axios.post(
+        'http://localhost:8080/api/recipe/manual/add', 
+        formDataToSend,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+  
+      console.log('Recipe draft saved successfully:', response.data);
+      alert('Recipe draft saved successfully!');
+      
     } catch (error) {
-      console.error('Error submitting recipe:', error);
-      alert('Failed to submit recipe. Please try again.');
+      console.error('Error saving draft:', error.response?.data || error.message);
+      alert('Failed to save draft. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -184,20 +339,6 @@ const RecipeSubmit = () => {
                   />
                 </div>
                 
-                <div>
-                  <label htmlFor="author" className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
-                  <input
-                    type="text"
-                    id="author"
-                    name="author"
-                    value={formData.author}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter your name or username"
-                    required
-                  />
-                </div>
-                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="dietType" className="block text-sm font-medium text-gray-700 mb-1">Diet Type</label>
@@ -210,9 +351,6 @@ const RecipeSubmit = () => {
                       <option value="Vegetarian">Vegetarian</option>
                       <option value="Vegan">Vegan</option>
                       <option value="Non-Vegetarian">Non-Vegetarian</option>
-                      <option value="Gluten-Free">Gluten-Free</option>
-                      <option value="Keto">Keto</option>
-                      <option value="Paleo">Paleo</option>
                     </select>
                   </div>
                   
@@ -313,6 +451,42 @@ const RecipeSubmit = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Describe any health benefits or concerns related to your recipe"
                 ></textarea>
+
+                {/* Health Score Slider */}
+                <div className="mt-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <label htmlFor="healthScore" className="block text-sm font-medium text-gray-700">Health Score (1-10)</label>
+                    <span className="text-lg font-semibold text-blue-600">{formData.healthScore}</span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="range"
+                      id="healthScore"
+                      name="healthScore"
+                      min="1"
+                      max="10"
+                      value={formData.healthScore}
+                      onChange={handleHealthScoreChange}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>1</span>
+                      <span>2</span>
+                      <span>3</span>
+                      <span>4</span>
+                      <span>5</span>
+                      <span>6</span>
+                      <span>7</span>
+                      <span>8</span>
+                      <span>9</span>
+                      <span>10</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500 mt-2">
+                      <span>Less Healthy</span>
+                      <span>Very Healthy</span>
+                    </div>
+                  </div>
+                </div>
               </div>
               
               <div>
@@ -449,7 +623,28 @@ const RecipeSubmit = () => {
           </div>
           
           {/* Submit Button */}
-          <div className="flex justify-center">
+          <div className="flex justify-center space-x-4">
+            <button
+              type="button"
+              onClick={handleSaveDraft}
+              className="inline-flex items-center px-6 py-3 bg-yellow-400 hover:bg-yellow-600 text-white font-medium text-lg rounded-lg shadow-md hover:shadow-lg transition-all"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
+                  Saving Draft...
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                  </svg>
+                  Save Draft
+                </>
+              )}
+            </button>
+
             <button
               type="submit"
               className="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-500 text-white font-medium text-lg rounded-lg shadow-md hover:shadow-lg transition-all"

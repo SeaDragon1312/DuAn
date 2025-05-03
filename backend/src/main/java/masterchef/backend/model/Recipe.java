@@ -37,6 +37,7 @@ public class Recipe {
     private Integer healthScore;
     private String allergyWarning;
     private String dietType;
+    private String preparationTime;
 
     @OneToOne
     @JoinColumn(name = "image_id", referencedColumnName = "id")

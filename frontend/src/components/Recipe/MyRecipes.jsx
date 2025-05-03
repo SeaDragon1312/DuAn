@@ -37,7 +37,7 @@ const MyRecipes = () => {
           author: recipe.user.fullName || recipe.user.username,
           imageUrl: recipe.image ? `http://localhost:8080/api/image/get?id=${recipe.image.id}` : '/images/default-recipe.png',
           dietType: recipe.dietType,
-          prepTime: "30 mins", // Add default or get from API if available
+          prepTime: recipe.preparationTime,
           dateCreated: recipe.publishedDate,
           description: recipe.introduction,
           status: recipe.publishedDate ? 'published' : 'draft'
@@ -88,17 +88,19 @@ const MyRecipes = () => {
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Back button at top */}
-      <div className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-3">
-          <Link to="/" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back
-          </Link>
+        <div className="bg-white shadow-sm sticky top-0 z-10">
+          <div className="container mx-auto px-4 py-3">
+            <button 
+              onClick={() => window.history.back()} 
+              className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+                Back
+            </button>
+          </div>
         </div>
-      </div>
-      
+        
       {/* Header section with dark background */}
       <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 py-12 shadow-lg">
         <div className="container mx-auto">
