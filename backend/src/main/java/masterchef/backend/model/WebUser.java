@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,6 +33,7 @@ public class WebUser {
     private String password;
     private String firstName;
     private String lastName;
+    @Transient
     private String fullName;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

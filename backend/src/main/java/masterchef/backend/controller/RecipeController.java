@@ -141,7 +141,7 @@ public class RecipeController {
 
             Recipe recipe = new Recipe(fullRecipeDTO.getDishName(), fullRecipeDTO.getIntroduction(),
                     fullRecipeDTO.getHealthImpact(), fullRecipeDTO.getHealthScore(),
-                    fullRecipeDTO.getAllergyWarning(), fullRecipeDTO.getDietType(), fullRecipeDTO.getPrepTime(),
+                    fullRecipeDTO.getAllergyWarning(), fullRecipeDTO.getDietType(), fullRecipeDTO.getPreparationTime(),
                     websiteImage, user, fullRecipeDTO.getIsPublished());
             recipeRepository.save(recipe);
 
@@ -166,4 +166,62 @@ public class RecipeController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping(value = "update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateRecipe(@RequestPart("recipeId") Integer recipeId,
+            @RequestPart("updatedRecipe") FullRecipeDTO fullRecipeDTO,
+            @RequestPart("image") MultipartFile imageFile) {
+
+
+        try {
+            Recipe recipe = recipeRepository.findById(recipeId).get();
+            // if (recipe == null)
+            // return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+            websiteImageRepository.deleteById(recipe.getImage().getId());
+
+            Blob imageBlob = new SerialBlob(imageFile.getBytes());
+            WebsiteImage websiteImage = new WebsiteImage(imageBlob);
+
+            recipe.setDishName(fullRecipeDTO.getDishName());
+            recipe.setIntroduction(fullRecipeDTO.getIntroduction());
+            recipe.setHealthImpact(fullRecipeDTO.getHealthImpact());
+            recipe.setHealthScore(fullRecipeDTO.getHealthScore());
+            recipe.setAllergyWarning(fullRecipeDTO.getAllergyWarning());
+            recipe.setDietType(fullRecipeDTO.getDietType());
+            recipe.setPreparationTime(fullRecipeDTO.getPreparationTime());
+            recipe.setImage(websiteImage);
+            recipe.setIsPublished(fullRecipeDTO.getIsPublished());
+
+            websiteImage.setRecipeId(recipe.getId());
+
+            recipeRepository.save(recipe);
+            websiteImageRepository.save(websiteImage);
+
+            List<Step> stepList = stepRepository.findAllByRecipe(recipe);
+            for (Step step : stepList) {
+                stepRepository.delete(step);
+            }
+            String[] stepListString = fullRecipeDTO.getStepList();
+            for (int i = 0; i < stepListString.length; i++) {
+                Step step = new Step(stepListString[i], i, recipe);
+                stepRepository.save(step);
+            }
+
+            List<Ingredient> ingredientList = ingredientRepository.findAllByRecipe(recipe);
+            for (Ingredient ingredient : ingredientList) {
+                ingredientRepository.delete(ingredient);
+            }
+            String[] ingredientListString = fullRecipeDTO.getIngredientList();
+            for (String ingredientString : ingredientListString) {
+                Ingredient ingredient = new Ingredient(ingredientString, recipe);
+                ingredientRepository.save(ingredient);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

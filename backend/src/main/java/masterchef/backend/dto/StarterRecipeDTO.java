@@ -8,7 +8,4 @@ import lombok.Getter;
 public class StarterRecipeDTO {
     private String dishName;
     private String procedure;
-
-    private String userId;
-    
 }

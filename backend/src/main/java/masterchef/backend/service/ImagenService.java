@@ -49,8 +49,8 @@ public class ImagenService {
 
                 String base64Data = extractBase64Image(response);
                 if (base64Data != null) {
-                    int imageId = saveBase64Image(base64Data, "gemini-native-image.png");
-                    return ConstantList.successfulHeader + imageId;
+                    saveBase64Image(base64Data, "gemini-native-image.png");
+                    return ConstantList.successfulHeader;
                 } else {
                     return "Failed to extract image data.";
                 }
@@ -98,19 +98,17 @@ public class ImagenService {
         return null;
     }
 
-    private int saveBase64Image(String base64Image, String fileName) {
+    private void saveBase64Image(String base64Image, String fileName) {
         try (FileOutputStream fos = new FileOutputStream(fileName)) {
             byte[] decodedBytes = Base64.getDecoder().decode(base64Image);
             fos.write(decodedBytes);
 
             // save image to database
-            int imageId = websiteImageService.saveImage(decodedBytes);
-            return imageId;
+            // int imageId = websiteImageService.saveImage(decodedBytes);
+            // return imageId;
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return -1;
     }
 }

@@ -6,53 +6,25 @@ import org.springframework.stereotype.Service;
 
 import masterchef.backend.ConstantList;
 import masterchef.backend.dto.StarterRecipeDTO;
-import masterchef.backend.model.Ingredient;
-import masterchef.backend.model.Recipe;
-import masterchef.backend.model.Step;
-import masterchef.backend.model.WebUser;
-import masterchef.backend.model.WebsiteImage;
-import masterchef.backend.repository.IngredientRepository;
-import masterchef.backend.repository.RecipeRepository;
-import masterchef.backend.repository.StepRepository;
-import masterchef.backend.repository.UserRepository;
-import masterchef.backend.repository.WebsiteImageRepository;
 import masterchef.backend.util.ClassParser;
 import masterchef.backend.util.ResponseRecipeFormat;
 
 @Service
 public class GenerativeRecipeService {
     @Autowired
-    private RecipeRepository recipeRepository;
-
-    @Autowired
     private GeminiTextService geminiTextService;
 
     @Autowired
     private ImagenService imagenService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private StepRepository stepRepository;
-
-    @Autowired
-    private IngredientRepository ingredientRepository;
-
-    @Autowired
-    private WebsiteImageRepository websiteImageRepository;
-
-    public String generateRecipe(StarterRecipeDTO recipeDTO) {
-        WebUser user = userRepository.findByUserId(recipeDTO.getUserId());
-        if (user == null)
-            return null;
+    public ResponseRecipeFormat generateRecipe(StarterRecipeDTO recipeDTO) {
 
         String imageIdResponse = imagenService.getImage(recipeDTO.getDishName());
         if (!imageIdResponse.contains(ConstantList.successfulHeader)) {
             return null;
         }
 
-        int imageId = Integer.parseInt(imageIdResponse.replace(ConstantList.successfulHeader, ""));
+        // int imageId = Integer.parseInt(imageIdResponse.replace(ConstantList.successfulHeader, ""));
 
         String godPrompt = "You will receive the procedure for how to cook \"" + recipeDTO.getDishName() +
                 "\". Your task is to generate introduction for this dish, create a list of step for this dish," +
@@ -66,7 +38,7 @@ public class GenerativeRecipeService {
                 ClassParser.parseClassToJson(ResponseRecipeFormat.class);
         String godResponse = geminiTextService.generateText(godPrompt);
 
-        WebsiteImage websiteImage = websiteImageRepository.findById(imageId).get();
+        // WebsiteImage websiteImage = websiteImageRepository.findById(imageId).get();
 
         try {
             JSONObject jsonObject = new JSONObject(sanitizeResponse(godResponse));
@@ -79,20 +51,23 @@ public class GenerativeRecipeService {
             String dietType = jsonObject.getString("dietType");
             String prepTime = jsonObject.getString("preparationTime");
 
-            Recipe recipe = new Recipe(recipeDTO.getDishName(), introduction, healthImpact, healthScore, allergyWarning,
-                    dietType, prepTime, websiteImage, user, true);
+            ResponseRecipeFormat responseRecipeFormat = new ResponseRecipeFormat(introduction, steps, ingredients,
+                    healthImpact, healthScore, allergyWarning, dietType, prepTime);
 
-            recipeRepository.save(recipe);
-            websiteImage.setRecipeId(recipe.getId());
+            // Recipe recipe = new Recipe(recipeDTO.getDishName(), introduction, healthImpact, healthScore, allergyWarning,
+            //         dietType, prepTime, websiteImage, user, true);
 
-            for (int i = 0; i < steps.length; i++) {
-                stepRepository.save(new Step(steps[i], i, recipe));
-            }
-            for (String ingredient : ingredients) {
-                ingredientRepository.save(new Ingredient(ingredient, recipe));
-            }
+            // recipeRepository.save(recipe);
+            // websiteImage.setRecipeId(recipe.getId());
 
-            return recipe.getId().toString();
+            // for (int i = 0; i < steps.length; i++) {
+            //     stepRepository.save(new Step(steps[i], i, recipe));
+            // }
+            // for (String ingredient : ingredients) {
+            //     ingredientRepository.save(new Ingredient(ingredient, recipe));
+            // }
+
+            return responseRecipeFormat;
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -6,6 +6,7 @@ import masterchef.backend.dto.StarterRecipeDTO;
 import masterchef.backend.service.GeminiTextService;
 import masterchef.backend.service.GenerativeRecipeService;
 import masterchef.backend.service.ImagenService;
+import masterchef.backend.util.ResponseRecipeFormat;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,11 +46,11 @@ public class GeminiController {
 
     @GetMapping("/generative-recipe")
     public ResponseEntity<?> generativeRecipe(@RequestBody StarterRecipeDTO recipeDTO) {
-        String recipeId = generativeRecipeService.generateRecipe(recipeDTO);
-        if (recipeId == null)
+        ResponseRecipeFormat recipeJson = generativeRecipeService.generateRecipe(recipeDTO);
+        if (recipeJson == null)
             return ResponseEntity.badRequest().body("Error generating recipe. Please try again.");
         
-        return new ResponseEntity<>(recipeId, HttpStatus.OK);
+        return new ResponseEntity<>(recipeJson, HttpStatus.OK);
     }
 
 }
