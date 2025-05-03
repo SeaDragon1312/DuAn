@@ -40,13 +40,13 @@ const MyRecipes = () => {
           prepTime: recipe.preparationTime,
           dateCreated: recipe.publishedDate,
           description: recipe.introduction,
-          status: recipe.publishedDate ? 'published' : 'draft'
+          status: recipe.isPublished ? 'published' : 'draft'
         }));
         
         setRecipes(transformedData);
-        setLoading(false);
       } catch (error) {
         console.error('Error fetching recipes:', error);
+      } finally {
         setLoading(false);
       }
     };
@@ -58,8 +58,8 @@ const MyRecipes = () => {
   const filteredRecipes = recipes.filter(recipe => {
     const matchesFilter = filter === 'all' || recipe.status === filter;
     const matchesSearch = recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         recipe.dietType.toLowerCase().includes(searchTerm.toLowerCase());
+                         recipe.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         recipe.dietType?.toLowerCase().includes(searchTerm.toLowerCase());
     
     return matchesFilter && matchesSearch;
   });
@@ -177,7 +177,7 @@ const MyRecipes = () => {
                     alt={recipe.title}
                     className="w-full h-48 object-cover"
                   />
-                  {recipe.dateCreated && (
+                  {recipe.dateCreated && recipe.status === 'published' && (
                     <div className="absolute top-3 right-3 bg-green-600 from-gray-900 to-gray-800 text-white text-xs font-bold px-2 py-1 rounded">
                       {new Date(recipe.dateCreated).toLocaleDateString()}
                     </div>
@@ -228,7 +228,7 @@ const MyRecipes = () => {
                       </Link>
                       
                       <button 
-                        onClick={() => handleDeleteRecipe(recipe.id)}
+                        onClick={() => handleDeleteRecipe(recipe)}
                         className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
                         title="Delete Recipe"
                       >

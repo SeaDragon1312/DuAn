@@ -123,15 +123,17 @@ const RecipeSubmit = () => {
 
       // Format the data for the API
       const recipeData = {
-        dishName: formData.title,
-        introduction: formData.description,
         healthImpact: formData.healthImpact,
-        healthScore: formData.healthScore,
-        allergyWarning: formData.allergyInfo,
-        dietType: formData.dietType,
+        preparationTime: formData.prepTime,
+        isPublished: true,
+        dishName: formData.title,
+        userId: userId,
         stepList: formData.steps.filter(step => step.trim() !== ''),
+        dietType: formData.dietType,
         ingredientList: allIngredients,
-        userId: userId
+        healthScore: formData.healthScore,
+        introduction: formData.description,
+        allergyWarning: formData.allergyInfo,
       };
   
       // Create FormData object for multipart/form-data
@@ -167,21 +169,26 @@ const RecipeSubmit = () => {
       
     } catch (error) {
       const userId = user.id
+      
       const allIngredients = [
         ...formData.ingredients.veggiesAndFruits,
         ...formData.ingredients.dairy,
         ...formData.ingredients.spicesAndCondiments
       ].filter(item => item.trim() !== '');
+
+      // Format the data for the API
       const recipeData = {
-        dishName: formData.title,
-        introduction: formData.description,
         healthImpact: formData.healthImpact,
-        healthScore: formData.healthScore,
-        allergyWarning: formData.allergyInfo,
-        dietType: formData.dietType,
+        preparationTime: formData.prepTime,
+        isPublished: true,
+        dishName: formData.title,
+        userId: userId,
         stepList: formData.steps.filter(step => step.trim() !== ''),
+        dietType: formData.dietType,
         ingredientList: allIngredients,
-        userId: userId
+        healthScore: formData.healthScore,
+        introduction: formData.description,
+        allergyWarning: formData.allergyInfo,
       };
       const formDataToSend = new FormData();
       
