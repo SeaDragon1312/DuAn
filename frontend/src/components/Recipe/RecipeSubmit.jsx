@@ -5,13 +5,20 @@ import "../../output.css";
 import WarningIcon from '../../assets/WarningIcon.jsx';
 import HealthIcon from '../../assets/HealthIcon.jsx';
 import { useUser } from "@clerk/clerk-react";
+import ImageHolder from "../Recipe/garlic-bread.png"; 
 
 const RecipeSubmit = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const { user, isLoaded } = useUser();
-  
+  const [procedure, setProcedure] = useState('');
+  const [aiSectionOpen, setAiSectionOpen] = useState(false);
+  const getHealthScoreColor = (score) => {
+    return score <= 5 ? 'red' : 'green';
+  };
+
   // Form state
   const [formData, setFormData] = useState({
     title: '',
@@ -29,10 +36,95 @@ const RecipeSubmit = () => {
     steps: ['']
   });
 
+  // Handle AI Recipe Generation
+  const handleGenerateRecipe = async () => {
+    if (!formData.title.trim() || !procedure.trim()) {
+      alert("Please enter a recipe title and procedure first");
+      return;
+    }
+    
+    setAiLoading(true);
+    
+    try {
+      // Call the generative recipe API
+      const aiResponse = await axios.post('http://localhost:8080/gemini/generative-recipe', {
+        dishName: formData.title,
+        procedure: procedure
+      });
+      
+      const recipeData = aiResponse.data;
+      
+      // Update ingredients by categories
+      const allIngredients = recipeData.ingredients || [];
+      const veggiesAndFruits = [];
+      const dairy = [];
+      const spicesAndCondiments = [];
+      
+      // Categorize ingredients (simple approach)
+      allIngredients.forEach(ingredient => {
+        const lowerIngredient = ingredient.toLowerCase();
+        if (lowerIngredient.includes('milk') || 
+            lowerIngredient.includes('cream') || 
+            lowerIngredient.includes('cheese') || 
+            lowerIngredient.includes('yogurt') || 
+            lowerIngredient.includes('butter')) {
+          dairy.push(ingredient);
+        } else if (lowerIngredient.includes('salt') || 
+                  lowerIngredient.includes('pepper') || 
+                  lowerIngredient.includes('spice') || 
+                  lowerIngredient.includes('oil') || 
+                  lowerIngredient.includes('sauce') || 
+                  lowerIngredient.includes('sugar') ||
+                  lowerIngredient.includes('vinegar')) {
+          spicesAndCondiments.push(ingredient);
+        } else {
+          veggiesAndFruits.push(ingredient);
+        }
+      });
+      
+      // Ensure arrays aren't empty
+      if (veggiesAndFruits.length === 0) veggiesAndFruits.push('');
+      if (dairy.length === 0) dairy.push('');
+      if (spicesAndCondiments.length === 0) spicesAndCondiments.push('');
+      
+      // Update form data with AI generated content
+      setFormData({
+        ...formData,
+        description: recipeData.introduction || formData.description,
+        healthImpact: recipeData.healthImpact || formData.healthImpact,
+        healthScore: recipeData.healthScore || formData.healthScore,
+        allergyInfo: recipeData.allergyWarning || formData.allergyInfo,
+        dietType: recipeData.dietType || formData.dietType,
+        prepTime: recipeData.preparationTime || formData.prepTime,
+        steps: recipeData.steps?.length ? recipeData.steps : [''],
+        ingredients: {
+          veggiesAndFruits,
+          dairy,
+          spicesAndCondiments
+        }
+      });
+      
+      setImagePreview(ImageHolder)
+      
+      alert("Recipe successfully generated with AI!");
+      
+    } catch (error) {
+      console.error('Error generating recipe with AI:', error.response?.data || error.message);
+      alert('Failed to generate recipe with AI. Please try again.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   // Handle form field changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  // Handle procedure input change
+  const handleProcedureChange = (e) => {
+    setProcedure(e.target.value);
   };
 
   // Handle diet type change
@@ -152,7 +244,7 @@ const RecipeSubmit = () => {
   
       // Send the request
       const response = await axios.post(
-        'http://localhost:8080/api/recipe/manual/add', 
+        'http://localhost:8080/api/recipe/manual/add',
         formDataToSend,
         {
           headers: {
@@ -162,10 +254,10 @@ const RecipeSubmit = () => {
       );
   
       console.log('Recipe submitted successfully:', response.data);
+
+      alert('Recipe submitted successfully!');
       
-      // Redirect to the recipe view page
-      // const recipeId = response.data.id || 'new-recipe'; // Replace with actual ID from response
-      // navigate(`/recipe/${recipeId}`);
+      navigate(`/recipe/my-recipes`);
       
     } catch (error) {
       const userId = user.id
@@ -228,15 +320,17 @@ const RecipeSubmit = () => {
       
       // Format the data for the API
       const recipeData = {
-        dishName: formData.title || "Draft Recipe",
-        introduction: formData.description || "",
-        healthImpact: formData.healthImpact || "",
-        healthScore: formData.healthScore || 10,
-        allergyWarning: formData.allergyInfo || "",
-        dietType: formData.dietType,
+        healthImpact: formData.healthImpact,
+        preparationTime: formData.prepTime,
+        isPublished: false,
+        dishName: formData.title,
+        userId: userId,
         stepList: formData.steps.filter(step => step.trim() !== ''),
+        dietType: formData.dietType,
         ingredientList: allIngredients,
-        userId: userId
+        healthScore: formData.healthScore,
+        introduction: formData.description,
+        allergyWarning: formData.allergyInfo,
       };
   
       // Create FormData object for multipart/form-data
@@ -267,6 +361,8 @@ const RecipeSubmit = () => {
   
       console.log('Recipe draft saved successfully:', response.data);
       alert('Recipe draft saved successfully!');
+
+      navigate(`/recipe/my-recipes`);
       
     } catch (error) {
       console.error('Error saving draft:', error.response?.data || error.message);
@@ -326,6 +422,88 @@ const RecipeSubmit = () => {
       {/* Main form content */}
       <div className="container mx-auto px-4 py-8">
         <form onSubmit={handleSubmit} className="space-y-8">
+          {/* AI Recipe Generator */}
+          <div className="bg-blue-50 border-l-4 border-blue-500 rounded-xl shadow-md p-8 hover:shadow-lg transition-shadow">
+            <div 
+              className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 cursor-pointer"
+              onClick={() => setAiSectionOpen(!aiSectionOpen)}
+            >
+              <div className="mb-4 md:mb-0 md:mr-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">AI Recipe Generator</h2>
+                <p className="text-gray-600">Too busy to find pictures, think of health benefits and other stuff? Just fill in the recipe title and things you need to note about the dish, our AI will do the rest!</p>
+                <p className="text-gray-600">Just click here!</p>
+              </div>
+              <div className="flex-shrink-0 flex items-center">
+                <img src="/images/ai-chef.svg" alt="AI Chef" className="w-24 h-24 mr-2" onError={(e) => {e.target.style.display = 'none'}} />
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-6 w-6 text-gray-600 transform transition-transform duration-300" 
+                  style={{ transform: aiSectionOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+            
+            {/* AI Generator content - only shown when aiSectionOpen is true */}
+            {aiSectionOpen && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="md:col-span-1">
+                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Recipe Title</label>
+                    <input
+                      type="text"
+                      id="ai-title"
+                      name="title"
+                      value={formData.title}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter recipe title"
+                    />
+                  </div>
+                  <div className="md:col-span-2 mb-2">
+                    <label htmlFor="procedure" className="block text-sm font-medium text-gray-700 mb-1">Procedures (To help AI understand your recipes better)</label>
+                    <textarea
+                      id="procedure"
+                      name="procedure"
+                      value={procedure}
+                      onChange={handleProcedureChange}
+                      rows="2"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Briefly describe how to make this dish (optional)"
+                    ></textarea>
+                  </div>
+                </div>
+                
+                <div className="flex justify-end mt-4">
+                  <button
+                    type="button"
+                    onClick={handleGenerateRecipe}
+                    className="inline-flex items-center px-6 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-md transition-colors cursor-pointer"
+                    disabled={aiLoading}
+                  >
+                    {aiLoading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                        Generating Recipe...
+                      </>
+                    ) : (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Generate with AI
+                      </>
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+          
           {/* Basic Recipe Information */}
           <div className="bg-white rounded-xl shadow-md p-8 hover:shadow-lg transition-shadow">
             <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Basic Information</h2>
@@ -404,11 +582,9 @@ const RecipeSubmit = () => {
                       <button
                         type="button"
                         onClick={() => setImagePreview(null)}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                        className="absolute top-2 right-2 text-white p-1 rounded-full"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"/></svg>
                       </button>
                     </div>
                   ) : (
@@ -426,7 +602,7 @@ const RecipeSubmit = () => {
                       />
                       <label
                         htmlFor="recipe-image"
-                        className="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-md transition-colors cursor-pointer"
+                        className="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-md transition-colors cursor-pointer"
                       >
                         Select Image
                       </label>
@@ -463,7 +639,9 @@ const RecipeSubmit = () => {
                 <div className="mt-4">
                   <div className="flex justify-between items-center mb-2">
                     <label htmlFor="healthScore" className="block text-sm font-medium text-gray-700">Health Score (1-10)</label>
-                    <span className="text-lg font-semibold text-blue-600">{formData.healthScore}</span>
+                    <span className={`text-lg font-semibold ${formData.healthScore <= 5 ? 'text-red-600' : 'text-green-600'}`}>
+                      {formData.healthScore}
+                    </span>
                   </div>
                   <div className="relative">
                     <input
@@ -474,7 +652,14 @@ const RecipeSubmit = () => {
                       max="10"
                       value={formData.healthScore}
                       onChange={handleHealthScoreChange}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, 
+                          ${formData.healthScore <= 5 ? '#f87171' : '#10b981'} 0%, 
+                          ${formData.healthScore <= 5 ? '#f87171' : '#10b981'} ${(formData.healthScore / 10) * 100}%, 
+                          #e5e7eb ${(formData.healthScore / 10) * 100}%, 
+                          #e5e7eb 100%)`
+                      }}
                     />
                     <div className="flex justify-between text-xs text-gray-500 mt-1">
                       <span>1</span>
@@ -488,9 +673,9 @@ const RecipeSubmit = () => {
                       <span>9</span>
                       <span>10</span>
                     </div>
-                    <div className="flex justify-between text-xs text-gray-500 mt-2">
-                      <span>Less Healthy</span>
-                      <span>Very Healthy</span>
+                    <div className="flex justify-between text-xs mt-2">
+                      <span className="text-red-600">Less Healthy</span>
+                      <span className="text-green-600">Very Healthy</span>
                     </div>
                   </div>
                 </div>

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,13 +45,12 @@ public class GeminiController {
         return geminiTextService.generateText(prompt);
     }
 
-    @GetMapping("/generative-recipe")
+    @PostMapping("/generative-recipe")
     public ResponseEntity<?> generativeRecipe(@RequestBody StarterRecipeDTO recipeDTO) {
         ResponseRecipeFormat recipeJson = generativeRecipeService.generateRecipe(recipeDTO);
         if (recipeJson == null)
             return ResponseEntity.badRequest().body("Error generating recipe. Please try again.");
-        
+
         return new ResponseEntity<>(recipeJson, HttpStatus.OK);
     }
-
 }
