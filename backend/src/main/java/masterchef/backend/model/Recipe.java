@@ -1,7 +1,11 @@
 package masterchef.backend.model;
 
 import java.util.Date;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -39,7 +44,9 @@ public class Recipe {
     private String dietType;
     private String preparationTime;
 
-    @OneToOne
+    private Boolean isPublished = false;
+
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
     private WebsiteImage image;
 
@@ -49,16 +56,27 @@ public class Recipe {
 
     private Date publishedDate;
 
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Step> stepList;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Ingredient> ingredientList;
+
     public Recipe(String dishName, String introduction, String healthImpact, Integer healthScore, String warning,
-            String dietType, WebsiteImage image, WebUser user) {
+            String dietType, String prepTime, WebsiteImage image, WebUser user, Boolean isPublished) {
         this.dishName = dishName;
         this.introduction = introduction;
         this.healthImpact = healthImpact;
         this.healthScore = healthScore;
         this.allergyWarning = warning;
         this.dietType = dietType;
+        this.preparationTime = prepTime;
         this.image = image;
         this.user = user;
-        this.publishedDate = new Date();
+        this.isPublished = isPublished == null ? false : isPublished;
+        if (this.isPublished)
+            this.publishedDate = new Date();
     }
 }

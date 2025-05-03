@@ -1,6 +1,7 @@
 package masterchef.backend.controller;
 
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import masterchef.backend.dto.DisplayRecipeDTO;
 import masterchef.backend.dto.FullRecipeDTO;
@@ -20,13 +21,17 @@ import java.util.ArrayList;
 import java.util.List;
 // import java.util.Optional;
 
+import javax.sql.rowset.serial.SerialBlob;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -73,10 +78,11 @@ public class RecipeController {
     public ResponseEntity<?> getAllRecipeForHomepage() {
         List<Recipe> recipeList = recipeRepository.findAll();
         List<DisplayRecipeDTO> displayRecipeDTOs = new ArrayList<>();
-        for (Recipe recipe : recipeList) {
-            DisplayRecipeDTO recipeDTO = new DisplayRecipeDTO(recipe);
-            displayRecipeDTOs.add(recipeDTO);
-        }
+        for (Recipe recipe : recipeList)
+            if (recipe.getIsPublished()) {
+                DisplayRecipeDTO recipeDTO = new DisplayRecipeDTO(recipe);
+                displayRecipeDTOs.add(recipeDTO);
+            }
 
         return new ResponseEntity<>(displayRecipeDTOs, HttpStatus.OK);
     }
@@ -121,34 +127,43 @@ public class RecipeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("manual/add")
-    public ResponseEntity<?> addRecipe(@RequestBody FullRecipeDTO fullRecipeDTO, @RequestParam Blob image) {
-        WebUser user = userRepository.findByUserId(fullRecipeDTO.getUserId());
-        // if (user == null)
-        // return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @PostMapping(value = "manual/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> addRecipe(@RequestPart("recipe") FullRecipeDTO fullRecipeDTO,
+            @RequestPart("image") MultipartFile imageFile) {
 
-        WebsiteImage websiteImage = new WebsiteImage(image);
+        try {
+            WebUser user = userRepository.findByUserId(fullRecipeDTO.getUserId());
+            // if (user == null)
+            // return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Recipe recipe = new Recipe(fullRecipeDTO.getDishName(), fullRecipeDTO.getIntroduction(),
-                fullRecipeDTO.getHealthImpact(), fullRecipeDTO.getHealthScore(),
-                fullRecipeDTO.getAllergyWarning(), fullRecipeDTO.getDietType(), websiteImage, user);
-        recipeRepository.save(recipe);
+            Blob imageBlob = new SerialBlob(imageFile.getBytes());
+            WebsiteImage websiteImage = new WebsiteImage(imageBlob);
 
-        websiteImage.setRecipeId(recipe.getId());
-        websiteImageRepository.save(websiteImage);
+            Recipe recipe = new Recipe(fullRecipeDTO.getDishName(), fullRecipeDTO.getIntroduction(),
+                    fullRecipeDTO.getHealthImpact(), fullRecipeDTO.getHealthScore(),
+                    fullRecipeDTO.getAllergyWarning(), fullRecipeDTO.getDietType(), fullRecipeDTO.getPrepTime(),
+                    websiteImage, user, fullRecipeDTO.getIsPublished());
+            recipeRepository.save(recipe);
 
-        String[] stepList = fullRecipeDTO.getStepList();
-        for (int i = 0; i < stepList.length; i++) {
-            Step step = new Step(stepList[i], i, recipe);
-            stepRepository.save(step);
+            websiteImage.setRecipeId(recipe.getId());
+            websiteImageRepository.save(websiteImage);
+
+            String[] stepList = fullRecipeDTO.getStepList();
+            for (int i = 0; i < stepList.length; i++) {
+                Step step = new Step(stepList[i], i, recipe);
+                stepRepository.save(step);
+            }
+
+            String[] ingredientList = fullRecipeDTO.getIngredientList();
+            for (String ingredientString : ingredientList) {
+                Ingredient ingredient = new Ingredient(ingredientString, recipe);
+                ingredientRepository.save(ingredient);
+            }
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        String[] ingredientList = fullRecipeDTO.getIngredientList();
-        for (String ingredientString : ingredientList) {
-            Ingredient ingredient = new Ingredient(ingredientString, recipe);
-            ingredientRepository.save(ingredient);
-        }
-
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

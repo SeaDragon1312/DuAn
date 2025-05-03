@@ -8,6 +8,8 @@ import masterchef.backend.service.GenerativeRecipeService;
 import masterchef.backend.service.ImagenService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,8 +44,12 @@ public class GeminiController {
     }
 
     @GetMapping("/generative-recipe")
-    public String generativeRecipe(@RequestBody StarterRecipeDTO recipeDTO) {
-        return "Res: " + generativeRecipeService.generateRecipe(recipeDTO);
+    public ResponseEntity<?> generativeRecipe(@RequestBody StarterRecipeDTO recipeDTO) {
+        String recipeId = generativeRecipeService.generateRecipe(recipeDTO);
+        if (recipeId == null)
+            return ResponseEntity.badRequest().body("Error generating recipe. Please try again.");
+        
+        return new ResponseEntity<>(recipeId, HttpStatus.OK);
     }
 
 }

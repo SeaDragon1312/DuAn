@@ -13,8 +13,10 @@ public class FullRecipeDTO {
     private Integer healthScore;
     private String allergyWarning;
     private String dietType;
+    private String prepTime;
     private String[] stepList;
     private String[] ingredientList;
+    private Boolean isPublished;
 
     private String userId;
 }

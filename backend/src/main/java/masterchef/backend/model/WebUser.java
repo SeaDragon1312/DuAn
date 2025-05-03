@@ -1,9 +1,14 @@
 package masterchef.backend.model;
 
-import com.clerk.backend_api.models.components.User;
+import java.util.List;
 
+import com.clerk.backend_api.models.components.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +32,11 @@ public class WebUser {
     private String password;
     private String firstName;
     private String lastName;
+    private String fullName;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Recipe> recipes;
 
     public String getFullName() {
         return firstName + " " + lastName;
@@ -38,6 +48,7 @@ public class WebUser {
         this.email = user.emailAddresses().get().get(0).emailAddress();
         this.firstName = user.firstName().get();
         this.lastName = user.lastName().get();
+        this.fullName = user.firstName().get() + " " + user.lastName().get();
     }
 
 }
