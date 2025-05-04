@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import masterchef.backend.ConstantList;
 import masterchef.backend.dto.StarterRecipeDTO;
+import masterchef.backend.model.ResponseRecipeWithImage;
 import masterchef.backend.util.ClassParser;
 import masterchef.backend.util.ResponseRecipeFormat;
 
@@ -17,14 +18,14 @@ public class GenerativeRecipeService {
     @Autowired
     private ImagenService imagenService;
 
-    public ResponseRecipeFormat generateRecipe(StarterRecipeDTO recipeDTO) {
+    public ResponseRecipeWithImage generateRecipe(StarterRecipeDTO recipeDTO) {
 
         String imageIdResponse = imagenService.getImage(recipeDTO.getDishName());
         if (!imageIdResponse.contains(ConstantList.successfulHeader)) {
             return null;
         }
 
-        // int imageId = Integer.parseInt(imageIdResponse.replace(ConstantList.successfulHeader, ""));
+        int imageId = Integer.parseInt(imageIdResponse.replace(ConstantList.successfulHeader, ""));
 
         String godPrompt = "You will receive the procedure for how to cook \"" + recipeDTO.getDishName() +
                 "\". Your task is to generate introduction for this dish, create a list of step for this dish," +
@@ -51,8 +52,8 @@ public class GenerativeRecipeService {
             String dietType = jsonObject.getString("dietType");
             String prepTime = jsonObject.getString("preparationTime");
 
-            ResponseRecipeFormat responseRecipeFormat = new ResponseRecipeFormat(introduction, steps, ingredients,
-                    healthImpact, healthScore, allergyWarning, dietType, prepTime);
+            ResponseRecipeWithImage responseRecipeWithImage = new ResponseRecipeWithImage(introduction, steps, ingredients,
+                    healthImpact, healthScore, allergyWarning, dietType, prepTime, imageId);
 
             // Recipe recipe = new Recipe(recipeDTO.getDishName(), introduction, healthImpact, healthScore, allergyWarning,
             //         dietType, prepTime, websiteImage, user, true);
@@ -67,7 +68,7 @@ public class GenerativeRecipeService {
             //     ingredientRepository.save(new Ingredient(ingredient, recipe));
             // }
 
-            return responseRecipeFormat;
+            return responseRecipeWithImage;
 
         } catch (Exception e) {
             e.printStackTrace();

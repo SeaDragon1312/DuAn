@@ -172,7 +172,6 @@ public class RecipeController {
             @RequestPart("updatedRecipe") FullRecipeDTO fullRecipeDTO,
             @RequestPart("image") MultipartFile imageFile) {
 
-
         try {
             Recipe recipe = recipeRepository.findById(recipeId).get();
             // if (recipe == null)
@@ -220,6 +219,7 @@ public class RecipeController {
 
         } catch (Exception e) {
             e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
