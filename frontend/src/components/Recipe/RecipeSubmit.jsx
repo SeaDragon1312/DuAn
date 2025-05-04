@@ -5,7 +5,6 @@ import "../../output.css";
 import WarningIcon from '../../assets/WarningIcon.jsx';
 import HealthIcon from '../../assets/HealthIcon.jsx';
 import { useUser } from "@clerk/clerk-react";
-import ImageHolder from "../Recipe/garlic-bread.png"; 
 
 const RecipeSubmit = () => {
   const navigate = useNavigate();
@@ -100,20 +99,9 @@ const RecipeSubmit = () => {
           spicesAndCondiments
         }
       });
-      
-      fetch(ImageHolder)
-      .then(res => res.blob())
-      .then(blob => {
-        // Tạo URL từ blob mới
-        const newImageUrl = URL.createObjectURL(blob);
-        setImagePreview(newImageUrl);
-      })
-      .catch(err => {
-        console.error("Lỗi khi tải ảnh mới:", err);
-        // Fallback nếu có lỗi
-        setImagePreview(ImageHolder);
-      });
-      
+
+      setImagePreview(`http://localhost:8080/api/image/get?id=${recipeData.imageId}`);
+
       alert("Recipe successfully generated with AI!");
       
     } catch (error) {

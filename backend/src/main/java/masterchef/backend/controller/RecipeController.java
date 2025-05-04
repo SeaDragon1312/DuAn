@@ -168,9 +168,9 @@ public class RecipeController {
     }
 
     @PostMapping(value = "update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateRecipe(@RequestPart("recipeId") Integer recipeId,
+    public ResponseEntity<?> updateRecipe(@RequestParam("recipeId") Integer recipeId,
             @RequestPart("updatedRecipe") FullRecipeDTO fullRecipeDTO,
-            @RequestPart("image") MultipartFile imageFile) {
+            @RequestPart(value = "image") MultipartFile imageFile) {
 
         try {
             Recipe recipe = recipeRepository.findById(recipeId).get();

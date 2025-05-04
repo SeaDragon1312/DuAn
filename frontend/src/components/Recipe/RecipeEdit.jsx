@@ -266,15 +266,10 @@ const RecipeEdit = () => {
       // Get the image file from the imagePreview
       if (imagePreview) {
         // Check if it's a new image (starts with data:) or an existing one (URL)
-        if (imagePreview.startsWith('data:')) {
           // Convert dataURL to file
-          const fetchRes = await fetch(imagePreview);
-          const blob = await fetchRes.blob();
-          formDataToSend.append('image', blob, 'recipe-image.jpg');
-        } else {
-          // For existing images, only include if it's been changed
-          // This is left empty as the server will keep the existing image
-        }
+        const fetchRes = await fetch(imagePreview);
+        const blob = await fetchRes.blob();
+        formDataToSend.append('image', blob, 'recipe-image.jpg');
       }
 
     console.log('Sending update with recipeId:', id);
