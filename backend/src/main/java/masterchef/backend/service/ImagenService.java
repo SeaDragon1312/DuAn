@@ -49,7 +49,7 @@ public class ImagenService {
 
                 String base64Data = extractBase64Image(response);
                 if (base64Data != null) {
-                    saveBase64Image(base64Data, "gemini-native-image.png");
+                    saveBase64Image(base64Data, "frontend/src/components/Recipe/garlic-bread.png");
                     return ConstantList.successfulHeader;
                 } else {
                     return "Failed to extract image data.";

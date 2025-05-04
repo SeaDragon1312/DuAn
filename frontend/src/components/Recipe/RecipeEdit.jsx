@@ -1,21 +1,19 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import "../../output.css";
 import WarningIcon from '../../assets/WarningIcon.jsx';
 import HealthIcon from '../../assets/HealthIcon.jsx';
 import { useUser } from "@clerk/clerk-react";
-import ImageHolder from "../Recipe/garlic-bread.png"; 
 
-const RecipeSubmit = () => {
+const RecipeEdit = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [aiLoading, setAiLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [imagePreview, setImagePreview] = useState(null);
   const { user, isLoaded } = useUser();
-  const [procedure, setProcedure] = useState('');
-  const [aiSectionOpen, setAiSectionOpen] = useState(false);
-
+  
   // Form state
   const [formData, setFormData] = useState({
     title: '',
@@ -30,109 +28,127 @@ const RecipeSubmit = () => {
       dairy: [''],
       spicesAndCondiments: ['']
     },
-    steps: ['']
+    steps: [''],
+    isPublished: true
   });
 
-  // Handle AI Recipe Generation
-  const handleGenerateRecipe = async () => {
-    if (!formData.title.trim() || !procedure.trim()) {
-      alert("Please enter a recipe title and procedure first");
-      return;
-    }
-    
-    setAiLoading(true);
-    
-    try {
-      // Call the generative recipe API
-      const aiResponse = await axios.post('http://localhost:8080/gemini/generative-recipe', {
-        dishName: formData.title,
-        procedure: procedure
-      });
-      
-      const recipeData = aiResponse.data;
-      
-      // Update ingredients by categories
-      const allIngredients = recipeData.ingredients || [];
-      const veggiesAndFruits = [];
-      const dairy = [];
-      const spicesAndCondiments = [];
-      
-      // Categorize ingredients (simple approach)
-      allIngredients.forEach(ingredient => {
-        const lowerIngredient = ingredient.toLowerCase();
-        if (lowerIngredient.includes('milk') || 
-            lowerIngredient.includes('cream') || 
-            lowerIngredient.includes('cheese') || 
-            lowerIngredient.includes('yogurt') || 
-            lowerIngredient.includes('butter')) {
-          dairy.push(ingredient);
-        } else if (lowerIngredient.includes('salt') || 
-                  lowerIngredient.includes('pepper') || 
-                  lowerIngredient.includes('spice') || 
-                  lowerIngredient.includes('oil') || 
-                  lowerIngredient.includes('sauce') || 
-                  lowerIngredient.includes('sugar') ||
-                  lowerIngredient.includes('vinegar')) {
-          spicesAndCondiments.push(ingredient);
-        } else {
-          veggiesAndFruits.push(ingredient);
+  // Fetch recipe data
+  useEffect(() => {
+    const fetchRecipeData = async () => {
+      try {
+        setInitialLoading(true);
+  
+        // Fetch recipe details
+        const recipeResponse = await fetch(`http://localhost:8080/api/recipe/get-by-param-id?id=${id}`);
+        
+        if (!recipeResponse.ok) {
+          throw new Error(`Recipe API error: ${recipeResponse.status}`);
         }
-      });
-      
-      // Ensure arrays aren't empty
-      if (veggiesAndFruits.length === 0) veggiesAndFruits.push('');
-      if (dairy.length === 0) dairy.push('');
-      if (spicesAndCondiments.length === 0) spicesAndCondiments.push('');
-      
-      // Update form data with AI generated content
-      setFormData({
-        ...formData,
-        description: recipeData.introduction || formData.description,
-        healthImpact: recipeData.healthImpact || formData.healthImpact,
-        healthScore: recipeData.healthScore || formData.healthScore,
-        allergyInfo: recipeData.allergyWarning || formData.allergyInfo,
-        dietType: recipeData.dietType || formData.dietType,
-        prepTime: recipeData.preparationTime || formData.prepTime,
-        steps: recipeData.steps?.length ? recipeData.steps : [''],
-        ingredients: {
-          veggiesAndFruits,
-          dairy,
-          spicesAndCondiments
+  
+        const recipeData = await recipeResponse.json();
+        console.log('Recipe data:', recipeData);
+  
+        // Fetch ingredients
+        const ingredientsResponse = await fetch(`http://localhost:8080/api/ingredient/recipe/get?recipeId=${id}`);
+        
+        if (!ingredientsResponse.ok) {
+          throw new Error(`Ingredients API error: ${ingredientsResponse.status}`);
         }
-      });
-      
-      fetch(ImageHolder)
-      .then(res => res.blob())
-      .then(blob => {
-        // Tạo URL từ blob mới
-        const newImageUrl = URL.createObjectURL(blob);
-        setImagePreview(newImageUrl);
-      })
-      .catch(err => {
-        console.error("Lỗi khi tải ảnh mới:", err);
-        // Fallback nếu có lỗi
-        setImagePreview(ImageHolder);
-      });
-      
-      alert("Recipe successfully generated with AI!");
-      
-    } catch (error) {
-      console.error('Error generating recipe with AI:', error.response?.data || error.message);
-      alert('Failed to generate recipe with AI. Please try again.');
-    } finally {
-      setAiLoading(false);
-    }
-  };
+  
+        const ingredientsData = await ingredientsResponse.json();
+        console.log('Ingredients data:', ingredientsData);
+  
+        // Fetch cooking steps
+        const stepsResponse = await fetch(`http://localhost:8080/api/step/recipe/get?recipeId=${id}`);
+        
+        if (!stepsResponse.ok) {
+          throw new Error(`Steps API error: ${stepsResponse.status}`);
+        }
+  
+        const stepsData = await stepsResponse.json();
+        console.log('Steps data:', stepsData);
+  
+        // Categorize ingredients
+        const categorizedIngredients = categorizeIngredients(ingredientsData);
+  
+        // Set image preview if available
+        if (recipeData.image?.id) {
+          setImagePreview(`http://localhost:8080/api/image/get?id=${recipeData.image.id}`);
+        }
+        
+        // Update form data with fetched recipe
+        setFormData({
+          title: recipeData.dishName || '',
+          dietType: recipeData.dietType || 'Vegetarian',
+          prepTime: recipeData.preparationTime || '',
+          description: recipeData.introduction || '',
+          healthImpact: recipeData.healthImpact || '',
+          healthScore: recipeData.healthScore || 8,
+          allergyInfo: recipeData.allergyWarning || '',
+          ingredients: {
+            veggiesAndFruits: categorizedIngredients.veggiesAndFruits.length > 0 ? 
+              categorizedIngredients.veggiesAndFruits : [''],
+            dairy: categorizedIngredients.dairy.length > 0 ? 
+              categorizedIngredients.dairy : [''],
+            spicesAndCondiments: categorizedIngredients.spicesAndCondiments.length > 0 ? 
+              categorizedIngredients.spicesAndCondiments : ['']
+          },
+          steps: stepsData.length > 0 ? stepsData.map(step => step.description) : [''],
+          isPublished: recipeData.isPublished !== undefined ? recipeData.isPublished : true
+        });
+        
+        setInitialLoading(false);
+      } catch (error) {
+        console.error('Error fetching recipe data:', error);
+        alert('Failed to load recipe. Please try again.');
+        navigate('/recipe/my-recipes');
+        setInitialLoading(false);
+      }
+    };
+  
+    fetchRecipeData();
+  }, [id, navigate]);
+
+  const categorizeIngredients = (ingredientsList) => {
+    // Default categories
+    const categories = {
+      veggiesAndFruits: [],
+      dairy: [],
+      spicesAndCondiments: []
+    };
+  
+    // Keywords to identify vegetable and fruit ingredients
+    const veggieKeywords = ['vegetable', 'tomato', 'onion', 'carrot', 'garlic', 
+      'scallion', 'herb', 'pepper', 'chili', 'lettuce', 'spinach', 'kale', 
+      'cilantro', 'basil', 'mint', 'lemon', 'lime', 'orange', 'apple', 'bean', 
+      'sprout', 'cabbage', 'cucumber', 'ginger', 'broccoli', 'fruit'];
+  
+    // Keywords to identify dairy ingredients
+    const dairyKeywords = ['milk', 'cheese', 'yogurt', 'cream', 'butter', 'dairy'];
+  
+    ingredientsList.forEach(ingredient => {
+      const name = ingredient.name.toLowerCase();
+  
+      // Check if ingredient is a veggie or fruit
+      if (veggieKeywords.some(keyword => name.includes(keyword))) {
+        categories.veggiesAndFruits.push(ingredient.name);
+      }
+      // Check if ingredient is dairy
+      else if (dairyKeywords.some(keyword => name.includes(keyword))) {
+        categories.dairy.push(ingredient.name);
+      }
+      // Everything else goes to spices and condiments
+      else {
+        categories.spicesAndCondiments.push(ingredient.name);
+      }
+    });
+    return categories;
+    };
 
   // Handle form field changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  };
-
-  // Handle procedure input change
-  const handleProcedureChange = (e) => {
-    setProcedure(e.target.value);
   };
 
   // Handle diet type change
@@ -200,20 +216,24 @@ const RecipeSubmit = () => {
     }
   };
 
+  // Handle publishing status change
+  const handlePublishStatusChange = (e) => {
+    setFormData({ ...formData, isPublished: e.target.checked });
+  };
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Validate form before submission
     setLoading(true);
 
     if (!isLoaded || !user) {
-      alert("You need to be logged in to submit recipes");
+      alert("You need to be logged in to update recipes");
       setLoading(false);
       return;
     }
     
     try {
-      const userId = user.id
+      const userId = user.id;
       
       const allIngredients = [
         ...formData.ingredients.veggiesAndFruits,
@@ -222,10 +242,10 @@ const RecipeSubmit = () => {
       ].filter(item => item.trim() !== '');
 
       // Format the data for the API
-      const recipeData = {
+      const updatedRecipe = {
         healthImpact: formData.healthImpact,
         preparationTime: formData.prepTime,
-        isPublished: true,
+        isPublished: formData.isPublished,
         dishName: formData.title,
         userId: userId,
         stepList: formData.steps.filter(step => step.trim() !== ''),
@@ -239,20 +259,30 @@ const RecipeSubmit = () => {
       // Create FormData object for multipart/form-data
       const formDataToSend = new FormData();
       
+      formDataToSend.append('recipeId', id);
       // Append the recipe data as a JSON string
-      formDataToSend.append('recipe', new Blob([JSON.stringify(recipeData)], { type: 'application/json' }));
+      formDataToSend.append('updatedRecipe', new Blob([JSON.stringify(updatedRecipe)], { type: 'application/json' }));
       
       // Get the image file from the imagePreview
       if (imagePreview) {
-        // Convert dataURL to file
-        const fetchRes = await fetch(imagePreview);
-        const blob = await fetchRes.blob();
-        formDataToSend.append('image', blob, 'recipe-image.jpg');
+        // Check if it's a new image (starts with data:) or an existing one (URL)
+        if (imagePreview.startsWith('data:')) {
+          // Convert dataURL to file
+          const fetchRes = await fetch(imagePreview);
+          const blob = await fetchRes.blob();
+          formDataToSend.append('image', blob, 'recipe-image.jpg');
+        } else {
+          // For existing images, only include if it's been changed
+          // This is left empty as the server will keep the existing image
+        }
       }
+
+    console.log('Sending update with recipeId:', id);
+    console.log('Updated Recipe data:', updatedRecipe);
   
-      // Send the request
+      // Send the request to update recipe
       const response = await axios.post(
-        'http://localhost:8080/api/recipe/manual/add',
+        `http://localhost:8080/api/recipe/update`,
         formDataToSend,
         {
           headers: {
@@ -261,120 +291,13 @@ const RecipeSubmit = () => {
         }
       );
   
-      console.log('Recipe submitted successfully:', response.data);
-
-      alert('Recipe submitted successfully!');
-      
+      console.log('Recipe updated successfully:', response.data);
+      alert('Recipe updated successfully!');
       navigate(`/recipe/my-recipes`);
       
     } catch (error) {
-      const userId = user.id
-      
-      const allIngredients = [
-        ...formData.ingredients.veggiesAndFruits,
-        ...formData.ingredients.dairy,
-        ...formData.ingredients.spicesAndCondiments
-      ].filter(item => item.trim() !== '');
-
-      // Format the data for the API
-      const recipeData = {
-        healthImpact: formData.healthImpact,
-        preparationTime: formData.prepTime,
-        isPublished: true,
-        dishName: formData.title,
-        userId: userId,
-        stepList: formData.steps.filter(step => step.trim() !== ''),
-        dietType: formData.dietType,
-        ingredientList: allIngredients,
-        healthScore: formData.healthScore,
-        introduction: formData.description,
-        allergyWarning: formData.allergyInfo,
-      };
-      const formDataToSend = new FormData();
-      
-      // Append the recipe data as a JSON string
-      formDataToSend.append('recipe', new Blob([JSON.stringify(recipeData)], { type: 'application/json' }));
-      
-      // Get the image file from the imagePreview
-      if (imagePreview) {
-        // Convert dataURL to file
-        const fetchRes = await fetch(imagePreview);
-        const blob = await fetchRes.blob();
-        formDataToSend.append('image', blob, 'recipe-image.jpg');
-      }
-      console.error('Error submitting recipe:', error.response?.data || error.message);
-      console.log('data:', recipeData);
-      console.log('imagePreview:', imagePreview);
-      console.log('formDataToSend:', formDataToSend);
-      alert('Failed to submit recipe. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  // Update the handleSaveDraft function with similar approach
-  const handleSaveDraft = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    try {
-      const userId = user.id;
-
-      const allIngredients = [
-        ...formData.ingredients.veggiesAndFruits,
-        ...formData.ingredients.dairy,
-        ...formData.ingredients.spicesAndCondiments
-      ].filter(item => item.trim() !== '');
-      
-      // Format the data for the API
-      const recipeData = {
-        healthImpact: formData.healthImpact,
-        preparationTime: formData.prepTime,
-        isPublished: false,
-        dishName: formData.title,
-        userId: userId,
-        stepList: formData.steps.filter(step => step.trim() !== ''),
-        dietType: formData.dietType,
-        ingredientList: allIngredients,
-        healthScore: formData.healthScore,
-        introduction: formData.description,
-        allergyWarning: formData.allergyInfo,
-      };
-  
-      // Create FormData object for multipart/form-data
-      const formDataToSend = new FormData();
-      
-      // Append the recipe data as a JSON string
-      formDataToSend.append('recipe', new Blob([JSON.stringify(recipeData)], { type: 'application/json' }));
-      
-      // Get the image file from the imagePreview
-      if (imagePreview) {
-        // Convert dataURL to file
-        const fetchRes = await fetch(imagePreview);
-        const blob = await fetchRes.blob();
-        formDataToSend.append('image', blob, 'recipe-image.jpg');
-      }
-  
-      // Send the request to save as draft
-      // You might need a different endpoint for drafts
-      const response = await axios.post(
-        'http://localhost:8080/api/recipe/manual/add', 
-        formDataToSend,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-  
-      console.log('Recipe draft saved successfully:', response.data);
-      alert('Recipe draft saved successfully!');
-
-      navigate(`/recipe/my-recipes`);
-      
-    } catch (error) {
-      console.error('Error saving draft:', error.response?.data || error.message);
-      alert('Failed to save draft. Please try again.');
+      console.error('Error updating recipe:', error.response?.data || error.message);
+      alert('Failed to update recipe. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -405,16 +328,27 @@ const RecipeSubmit = () => {
     ));
   };
 
+  if (initialLoading) {
+    return (
+      <div className="bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-center text-xl font-medium text-gray-600">Loading recipe data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Back button at top */}
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-3">
-          <Link to="/" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
+          <Link to="/recipe/my-recipes" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back
+            Back to My Recipes
           </Link>
         </div>
       </div>
@@ -422,96 +356,14 @@ const RecipeSubmit = () => {
       {/* Header section with dark background */}
       <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 py-12 shadow-lg">
         <div className="container mx-auto">
-          <h1 className="text-4xl font-bold mb-3 leading-tight">Share Your Recipe</h1>
-          <p className="mb-4 text-gray-300 text-lg">Share your culinary creations with our community of food lovers</p>
+          <h1 className="text-4xl font-bold mb-3 leading-tight">Edit Recipe</h1>
+          <p className="mb-4 text-gray-300 text-lg">Update your recipe information and details</p>
         </div>
       </div>
       
       {/* Main form content */}
       <div className="container mx-auto px-4 py-8">
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* AI Recipe Generator */}
-          <div className="bg-blue-50 border-l-4 border-blue-500 rounded-xl shadow-md p-8 hover:shadow-lg transition-shadow">
-            <div 
-              className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 cursor-pointer"
-              onClick={() => setAiSectionOpen(!aiSectionOpen)}
-            >
-              <div className="mb-4 md:mb-0 md:mr-6">
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">AI Recipe Generator</h2>
-                <p className="text-gray-600">Too busy to find pictures, think of health benefits and other stuff? Just fill in the recipe title and things you need to note about the dish, our AI will do the rest!</p>
-                <p className="text-green-600">Just click here!</p>
-              </div>
-              <div className="flex-shrink-0 flex items-center">
-                <img src="/images/ai-chef.svg" alt="AI Chef" className="w-24 h-24 mr-2" onError={(e) => {e.target.style.display = 'none'}} />
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  className="h-6 w-6 text-gray-600 transform transition-transform duration-300" 
-                  style={{ transform: aiSectionOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-            
-            {/* AI Generator content - only shown when aiSectionOpen is true */}
-            {aiSectionOpen && (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="md:col-span-1">
-                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Recipe Title</label>
-                    <input
-                      type="text"
-                      id="ai-title"
-                      name="title"
-                      value={formData.title}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter recipe title"
-                    />
-                  </div>
-                  <div className="md:col-span-2 mb-2">
-                    <label htmlFor="procedure" className="block text-sm font-medium text-gray-700 mb-1">Procedures (To help AI understand your recipes better)</label>
-                    <textarea
-                      id="procedure"
-                      name="procedure"
-                      value={procedure}
-                      onChange={handleProcedureChange}
-                      rows="2"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Briefly describe how to make this dish (optional)"
-                    ></textarea>
-                  </div>
-                </div>
-                
-                <div className="flex justify-end mt-4">
-                  <button
-                    type="button"
-                    onClick={handleGenerateRecipe}
-                    className="inline-flex items-center px-6 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-md transition-colors cursor-pointer"
-                    disabled={aiLoading}
-                  >
-                    {aiLoading ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                        Generating Recipe...
-                      </>
-                    ) : (
-                      <>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                        Generate with AI
-                      </>
-                    )}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-          
           {/* Basic Recipe Information */}
           <div className="bg-white rounded-xl shadow-md p-8 hover:shadow-lg transition-shadow">
             <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Basic Information</h2>
@@ -574,6 +426,19 @@ const RecipeSubmit = () => {
                     placeholder="Describe your recipe and what makes it special"
                     required
                   ></textarea>
+                </div>
+
+                <div className="flex items-center space-x-2 mt-2">
+                  <input
+                    type="checkbox"
+                    id="isPublished"
+                    checked={formData.isPublished}
+                    onChange={handlePublishStatusChange}
+                    className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="isPublished" className="text-sm font-medium text-gray-700">
+                    Published (uncheck to save as draft)
+                  </label>
                 </div>
               </div>
               
@@ -824,45 +689,34 @@ const RecipeSubmit = () => {
             </div>
           </div>
           
-          {/* Submit Button */}
+          {/* Submit and Cancel Buttons */}
           <div className="flex justify-center space-x-4">
-            <button
-              type="button"
-              onClick={handleSaveDraft}
-              className="inline-flex items-center px-6 py-3 bg-yellow-400 hover:bg-yellow-600 text-white font-medium text-lg rounded-lg shadow-md hover:shadow-lg transition-all"
-              disabled={loading}
+            <Link
+              to="/recipe/my-recipes"
+              className="inline-flex items-center px-6 py-3 bg-red-400 hover:bg-red-500 text-white font-medium text-lg rounded-lg shadow-md hover:shadow-lg transition-all"
             >
-              {loading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
-                  Saving Draft...
-                </>
-              ) : (
-                <>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                  </svg>
-                  Save Draft
-                </>
-              )}
-            </button>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Cancel
+            </Link>
 
             <button
               type="submit"
-              className="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-500 text-white font-medium text-lg rounded-lg shadow-md hover:shadow-lg transition-all"
+              className="inline-flex items-center px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-medium text-lg rounded-lg shadow-md hover:shadow-lg transition-all"
               disabled={loading}
             >
               {loading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
-                  Publishing Recipe...
+                  Updating Recipe...
                 </>
               ) : (
                 <>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                   </svg>
-                  Share Recipe
+                  Save Changes
                 </>
               )}
             </button>
@@ -873,11 +727,11 @@ const RecipeSubmit = () => {
       {/* Footer */}
       <div className="bg-gray-100 border-t border-gray-200 py-8 mt-12">
         <div className="container mx-auto px-4 text-center text-gray-500">
-          <p>Share Your Best Recipes • Food Blog</p>
+          <p>Edit Your Recipe • Food Blog</p>
         </div>
       </div>
     </div>
   );
 };
 
-export default RecipeSubmit;
+export default RecipeEdit;

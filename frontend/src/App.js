@@ -10,6 +10,7 @@ import ContactPage from "./pages/ContactPage";
 import RecipeView from "./components/Recipe/RecipeView";
 import RecipeSubmit from "./components/Recipe/RecipeSubmit";
 import MyRecipes from "./components/Recipe/MyRecipes";
+import RecipeEdit from "./components/Recipe/RecipeEdit";
 import {
   SignedIn,
   SignedOut,
@@ -77,6 +78,14 @@ function App() {
                 element={
                   <DefaultLayout>
                     <MyRecipes />
+                  </DefaultLayout>
+                }
+              />
+              <Route
+                path="/recipe/edit/:id"
+                element={
+                  <DefaultLayout>
+                    <RecipeEdit />
                   </DefaultLayout>
                 }
               />
