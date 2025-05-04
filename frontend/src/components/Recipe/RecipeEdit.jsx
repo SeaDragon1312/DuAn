@@ -298,6 +298,55 @@ const RecipeEdit = () => {
     } catch (error) {
       console.error('Error updating recipe:', error.response?.data || error.message);
       alert('Failed to update recipe. Please try again.');
+
+      const userId = user.id;
+      
+      const allIngredients = [
+        ...formData.ingredients.veggiesAndFruits,
+        ...formData.ingredients.dairy,
+        ...formData.ingredients.spicesAndCondiments
+      ].filter(item => item.trim() !== '');
+
+      // Format the data for the API
+      const updatedRecipe = {
+        healthImpact: formData.healthImpact,
+        preparationTime: formData.prepTime,
+        isPublished: formData.isPublished,
+        dishName: formData.title,
+        userId: userId,
+        stepList: formData.steps.filter(step => step.trim() !== ''),
+        dietType: formData.dietType,
+        ingredientList: allIngredients,
+        healthScore: formData.healthScore,
+        introduction: formData.description,
+        allergyWarning: formData.allergyInfo,
+      };
+  
+      // Create FormData object for multipart/form-data
+      const formDataToSend = new FormData();
+      
+      formDataToSend.append('recipeId', id);
+      // Append the recipe data as a JSON string
+      formDataToSend.append('updatedRecipe', new Blob([JSON.stringify(updatedRecipe)], { type: 'application/json' }));
+      
+      // Get the image file from the imagePreview
+      if (imagePreview) {
+        // Check if it's a new image (starts with data:) or an existing one (URL)
+        if (imagePreview.startsWith('data:')) {
+          // Convert dataURL to file
+          const fetchRes = await fetch(imagePreview);
+          const blob = await fetchRes.blob();
+          formDataToSend.append('image', blob, 'recipe-image.jpg');
+        } else {
+          // For existing images, only include if it's been changed
+          // This is left empty as the server will keep the existing image
+        }
+      }
+
+      console.log('Sending update with recipeId:', id);
+      console.log('Updated Recipe data:', updatedRecipe);
+      console.log('image', imagePreview);
+      console.log('formDataToSend', formDataToSend);
     } finally {
       setLoading(false);
     }
