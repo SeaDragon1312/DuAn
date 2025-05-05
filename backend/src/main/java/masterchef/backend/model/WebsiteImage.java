@@ -4,6 +4,7 @@ import java.sql.Blob;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,15 +27,16 @@ public class WebsiteImage {
     private Integer id;
 
     @JsonIgnore
-    private Blob imageData;
+    @Column(columnDefinition = "bytea") // Chỉ định kiểu dữ liệu PostgreSQL
+    private byte[] imageData; // Sử dụng byte[] thay vì Blob
 
     private Integer recipeId;
 
-    public WebsiteImage(Blob imageData) {
+    public WebsiteImage(byte[] imageData) {
         this.imageData = imageData;
     }
 
-    public WebsiteImage(Blob imageData, Integer recipeId) {
+    public WebsiteImage(byte[] imageData, Integer recipeId) {
         this.imageData = imageData;
         this.recipeId = recipeId;
     }

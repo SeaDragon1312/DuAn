@@ -16,7 +16,7 @@ public class WebsiteImageService {
     private WebsiteImageRepository websiteImageRepository;
 
     public Integer saveImage(byte[] imageData) throws Exception {
-        Blob blob = new SerialBlob(imageData);
+        byte[] blob = imageData;
 
         WebsiteImage websiteImage = new WebsiteImage(blob);
         websiteImageRepository.save(websiteImage);

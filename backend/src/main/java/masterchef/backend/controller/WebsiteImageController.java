@@ -24,7 +24,7 @@ public class WebsiteImageController {
     WebsiteImageRepository websiteImageRepository;
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadImage(@RequestBody Blob image) {
+    public ResponseEntity<?> uploadImage(@RequestBody byte[] image) {
         websiteImageRepository.save(new WebsiteImage(image));
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -34,14 +34,13 @@ public class WebsiteImageController {
         WebsiteImage image = websiteImageRepository.findById(id).get();
 
         try {
-            Blob blob = image.getImageData();
-            byte[] imageBytes = blob.getBytes(1, (int) blob.length());
+            byte[] imageBytes = image.getImageData();
 
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
             headers.setContentType(MediaType.IMAGE_PNG);
             return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
