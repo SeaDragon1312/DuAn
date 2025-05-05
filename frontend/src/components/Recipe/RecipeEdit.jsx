@@ -73,7 +73,7 @@ const RecipeEdit = () => {
   
         // Set image preview if available
         if (recipeData.image?.id) {
-          setImagePreview(`http://localhost:8080/api/image/get?id=${recipeData.image.id}`);
+          setImagePreview(`https://duan-1jwf.onrender.com/api/image/get?id=${recipeData.image.id}`);
         }
         
         // Update form data with fetched recipe
@@ -277,7 +277,7 @@ const RecipeEdit = () => {
   
       // Send the request to update recipe
       const response = await axios.post(
-        `http://localhost:8080/api/recipe/update`,
+        `https://duan-1jwf.onrender.com/api/recipe/update`,
         formDataToSend,
         {
           headers: {

@@ -221,7 +221,7 @@ const RecipeView = () => {
             <div className="md:w-1/2">
               <div className="rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
           <img 
-            src={`http://localhost:8080/api/image/get?id=${recipe.image?.id}` || '/default-recipe.jpg'} 
+            src={`https://duan-1jwf.onrender.com/api/image/get?id=${recipe.image?.id}` || '/default-recipe.jpg'} 
             alt={recipe.dishName} 
             className="w-full h-80 object-contain bg-gray-700"
           />

@@ -100,7 +100,7 @@ const RecipeSubmit = () => {
         }
       });
 
-      setImagePreview(`http://localhost:8080/api/image/get?id=${recipeData.imageId}`);
+      setImagePreview(`https://duan-1jwf.onrender.com/api/image/get?id=${recipeData.imageId}`);
 
       alert("Recipe successfully generated with AI!");
       
@@ -240,7 +240,7 @@ const RecipeSubmit = () => {
   
       // Send the request
       const response = await axios.post(
-        'http://localhost:8080/api/recipe/manual/add',
+        'https://duan-1jwf.onrender.com/api/recipe/manual/add',
         formDataToSend,
         {
           headers: {
@@ -346,7 +346,7 @@ const RecipeSubmit = () => {
       // Send the request to save as draft
       // You might need a different endpoint for drafts
       const response = await axios.post(
-        'http://localhost:8080/api/recipe/manual/add', 
+        'https://duan-1jwf.onrender.com/api/recipe/manual/add', 
         formDataToSend,
         {
           headers: {

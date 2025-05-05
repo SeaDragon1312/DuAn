@@ -101,7 +101,7 @@ const HomePage = () => {
 
         <RecipeCard
           id="2"
-          imageUrl="http://localhost:8080/api/image/get?id=2"
+          imageUrl="https://duan-1jwf.onrender.com/api/image/get?id=2"
           title="The Best Garlic Bread You'll Ever Eat"
           author="Sea Dragon"
           dietType="Vegetarian"
