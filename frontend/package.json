@@ -17,8 +17,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "build:css": "tailwindcss -i ./src/input.css -o ./src/output.css --minify",
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "npm run build:css && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

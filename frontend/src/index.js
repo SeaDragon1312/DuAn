@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App";
 import { ClerkProvider } from "@clerk/clerk-react";
 import reportWebVitals from "./reportWebVitals";
+import "../src/output.css";
 
 const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 if (!clerkPubKey) {
