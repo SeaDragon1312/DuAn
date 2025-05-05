@@ -43,7 +43,7 @@ const RecipeSubmit = () => {
     
     try {
       // Call the generative recipe API
-      const aiResponse = await axios.post('http://localhost:8080/gemini/generative-recipe', {
+      const aiResponse = await axios.post('https://duan-1jwf.onrender.com/gemini/generative-recipe', {
         dishName: formData.title,
         procedure: procedure
       });

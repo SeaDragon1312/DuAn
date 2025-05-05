@@ -19,7 +19,7 @@ const RecipeView = () => {
         setLoading(true);
 
         // Fetch recipe details
-        const recipeResponse = await fetch(`http://localhost:8080/api/recipe/get-by-param-id?id=${id}`);
+        const recipeResponse = await fetch(`https://duan-1jwf.onrender.com/api/recipe/get-by-param-id?id=${id}`);
         // const recipeResponse = await fetch('http://localhost:8080/api/recipe/get', {
         //   method: 'POST',
         //   headers: {
@@ -35,7 +35,7 @@ const RecipeView = () => {
         const recipeData = await recipeResponse.json();
 
         // Fetch ingredients
-        const ingredientsResponse = await fetch(`http://localhost:8080/api/ingredient/recipe/get?recipeId=${id}`);
+        const ingredientsResponse = await fetch(`https://duan-1jwf.onrender.com/api/ingredient/recipe/get?recipeId=${id}`);
         
         if (!ingredientsResponse.ok) {
           throw new Error(`Ingredients API error: ${ingredientsResponse.status}`);
@@ -44,7 +44,7 @@ const RecipeView = () => {
         const ingredientsData = await ingredientsResponse.json();
 
         // Fetch cooking steps
-        const stepsResponse = await fetch(`http://localhost:8080/api/step/recipe/get?recipeId=${id}`);
+        const stepsResponse = await fetch(`https://duan-1jwf.onrender.com/api/step/recipe/get?recipeId=${id}`);
         
         if (!stepsResponse.ok) {
           throw new Error(`Steps API error: ${stepsResponse.status}`);

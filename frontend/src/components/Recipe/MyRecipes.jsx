@@ -21,7 +21,7 @@ const MyRecipes = () => {
         setLoading(true);
         // Fetch user's recipes from the backend API using the full URL
         console.log(user);
-        const myRecipeResponse = await fetch(`http://localhost:8080/api/recipe/user/get?userId=${user.id}`);
+        const myRecipeResponse = await fetch(`https://duan-1jwf.onrender.com/api/recipe/user/get?userId=${user.id}`);
         
         if (!myRecipeResponse.ok) {
           throw new Error(`My Recipes API error: ${myRecipeResponse.status}`);
@@ -35,7 +35,7 @@ const MyRecipes = () => {
           id: recipe.id.toString(),
           title: recipe.dishName,
           author: recipe.user.fullName || recipe.user.username,
-          imageUrl: recipe.image ? `http://localhost:8080/api/image/get?id=${recipe.image.id}` : '/images/default-recipe.png',
+          imageUrl: recipe.image ? `https://duan-1jwf.onrender.com/api/image/get?id=${recipe.image.id}` : '/images/default-recipe.png',
           dietType: recipe.dietType,
           prepTime: recipe.preparationTime,
           dateCreated: recipe.publishedDate,
@@ -68,7 +68,7 @@ const MyRecipes = () => {
   const handleDeleteRecipe = async (id) => {
     if (window.confirm('Are you sure you want to delete this recipe?')) {
       try {
-        const response = await fetch(`http://localhost:8080/api/recipe/delete/${id}`, {
+        const response = await fetch(`https://duan-1jwf.onrender.com/api/recipe/delete/${id}`, {
           method: 'POST',
         });
         

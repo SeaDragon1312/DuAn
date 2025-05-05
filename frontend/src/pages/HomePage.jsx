@@ -42,7 +42,7 @@ const HomePage = () => {
 
   const fetchRecipes = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/recipe/get/homepage-all");
+      const response = await fetch("https://duan-1jwf.onrender.com/api/recipe/get/homepage-all");
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
