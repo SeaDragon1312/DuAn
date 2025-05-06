@@ -220,11 +220,15 @@ const RecipeView = () => {
             
             <div className="md:w-1/2">
               <div className="rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
-          <img 
-            src={`http://localhost:8080/api/image/get?id=${recipe.image?.id}` || '/default-recipe.jpg'} 
-            alt={recipe.dishName} 
-            className="w-full h-80 object-contain bg-gray-700"
-          />
+                <img 
+                  src={`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/api/image/get?id=${recipe.image?.id}` || '/default-recipe.jpg'} 
+                  alt={recipe.dishName} 
+                  className="w-full h-80 object-cover" // Đã xóa bg-gray-700 và chuyển từ object-contain sang object-cover
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/default-recipe.jpg'; // Fallback nếu ảnh không tải được
+                  }}
+                />
               </div>
             </div>
           </div>
