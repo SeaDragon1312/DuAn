@@ -136,7 +136,7 @@ public class RecipeController {
             // if (user == null)
             // return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-            byte[] imageBlob = imageFile.getBytes();
+            Blob imageBlob = new SerialBlob(imageFile.getBytes());
             WebsiteImage websiteImage = new WebsiteImage(imageBlob);
 
             Recipe recipe = new Recipe(fullRecipeDTO.getDishName(), fullRecipeDTO.getIntroduction(),
@@ -179,7 +179,7 @@ public class RecipeController {
 
             websiteImageRepository.deleteById(recipe.getImage().getId());
 
-            byte[] imageBlob = imageFile.getBytes();
+            Blob imageBlob = new SerialBlob(imageFile.getBytes());
             WebsiteImage websiteImage = new WebsiteImage(imageBlob);
 
             recipe.setDishName(fullRecipeDTO.getDishName());

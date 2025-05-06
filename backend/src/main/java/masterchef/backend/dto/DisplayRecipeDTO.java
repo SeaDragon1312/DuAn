@@ -14,7 +14,7 @@ public class DisplayRecipeDTO {
 
     public DisplayRecipeDTO(Recipe recipe) {
         this.id = recipe.getId();
-        this.imageUrl = "https://duan-1jwf.onrender.com/api/image/get?id=" + recipe.getImage().getId();
+        this.imageUrl = "http://localhost:8080/api/image/get?id=" + recipe.getImage().getId();
         this.title = recipe.getDishName();
         this.author = recipe.getUser().getFullName();
         this.dietType = recipe.getDietType();

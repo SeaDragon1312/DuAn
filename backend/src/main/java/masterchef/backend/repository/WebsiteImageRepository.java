@@ -9,5 +9,5 @@ import java.sql.Blob;
 
 @Repository
 public interface WebsiteImageRepository extends JpaRepository<WebsiteImage, Integer> {
-    List<WebsiteImage> findByImageData(byte[] imageData);
+    List<WebsiteImage> findByImageData(Blob imageData);
 }
